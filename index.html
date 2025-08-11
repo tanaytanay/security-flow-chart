@@ -94,6 +94,13 @@
 
         <div class="controls">
             <button class="btn" onclick="resetToDefault()">Reset to Default</button>
+            
+            <div style="margin-top: 20px; text-align: center;">
+                <h4 style="color: #2c3e50; margin-bottom: 15px;">Path Configurations:</h4>
+                <button class="btn" onclick="highlightPath('ingress', 'Agent 3', 'LLM2')" style="background-color: #e74c3c;">Config 1: Ingress → Agent 3 → LLM2</button>
+                <button class="btn" onclick="highlightPath('egress', 'Agent 2', 'LLM1')" style="background-color: #f39c12;">Config 2: Egress → Agent 2 → LLM1</button>
+                <button class="btn" onclick="highlightPath('ingress', 'Agent 4', 'LLM2')" style="background-color: #9b59b6;">Config 3: Ingress → Agent 4 → LLM2</button>
+            </div>
         </div>
 
         <!-- Mermaid container - will be dynamically populated -->
@@ -147,6 +154,15 @@
             location.reload();
         }
 
+        // Highlight specific path based on button click
+        function highlightPath(type, agentId, llmId) {
+            renderMermaid({
+                type: type,
+                agentId: agentId,
+                llmId: llmId
+            });
+        }
+
         // Show/hide custom node examples
         function showCustomNodeExample() {
             const example = document.getElementById('customExample');
@@ -166,6 +182,11 @@
             }
         });
 
+        // Ensure Mermaid is loaded
+        if (typeof mermaid === 'undefined') {
+            console.error('Mermaid library not loaded!');
+        }
+
 
 
         // Generates Mermaid diagram source string with path marking
@@ -183,6 +204,12 @@
             // Create VM label with default blue colors
             let vmLabel = `<div style='text-align: center;'><strong>${data.vm.name}</strong><br/><div style='display: flex; flex-direction: column; align-items: center; gap: 10px;'><div id='ingress-circle' style='width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle, #3498db, #3498db); border: 2px solid #fff; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px;'>ingress</div><div id='egress-circle' style='width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle, #3498db, #3498db); border: 2px solid #fff; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px;'>egress</div></div></div>`;
 
+            // Add Attacker node definition
+            lines.push(`A((<strong>${data.attacker}</strong>))`);
+            
+            // Add VM node definition
+            lines.push(`B["${vmLabel}"]`);
+            
             nodeClasses[attackerId] = "node-unmarked";
             nodeClasses[vmId] = "node-unmarked";
 
@@ -191,14 +218,14 @@
                 nodeClasses[agentId] = "node-unmarked";
 
                 edges.push([vmId, agentId]);
-                lines.push(`B --> ${agentId}((${agent.name}))`);
+                lines.push(`B --> ${agentId}((${agent.id}))`);
 
                 agent.llms.forEach((llm, li) => {
                     const llmId = `D${ai + 1}_${li + 1}`;
                     nodeClasses[llmId] = "node-unmarked";
 
                     edges.push([agentId, llmId]);
-                    lines.push(`${agentId} --> ${llmId}((${llm.name}))`);
+                    lines.push(`${agentId} --> ${llmId}((${llm.id}))`);
                 });
             });
 
@@ -206,10 +233,10 @@
             let markedAgentId = null;
             let markedLlmId = null;
             data.agents.forEach((agent, ai) => {
-                if (agent.name === mark.agentName) {
+                if (agent.id === mark.agentId) {
                     markedAgentId = `C${ai + 1}`;
                     agent.llms.forEach((llm, li) => {
-                        if (llm.name === mark.llmName) {
+                        if (llm.id === mark.llmId) {
                             markedLlmId = `D${ai + 1}_${li + 1}`;
                         }
                     });
@@ -218,7 +245,7 @@
 
             // Only mark nodes if we have a valid mark configuration AND all required nodes exist
             const isValidMark = mark &&
-                (mark.circle === "ingress" || mark.circle === "egress") &&
+                (mark.type === "ingress" || mark.type === "egress") &&
                 markedAgentId &&
                 markedLlmId;
 
@@ -228,15 +255,15 @@
                 nodeClasses[markedLlmId] = "node-marked";
                 
                 // Update circle colors only when the entire path is valid
-                if (mark.circle === "ingress") {
+                if (mark.type === "ingress") {
                     vmLabel = vmLabel.replace('id=\'ingress-circle\' style=\'width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle, #3498db, #3498db)', 'id=\'ingress-circle\' style=\'width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle, #e74c3c, #e74c3c)');
-                } else if (mark.circle === "egress") {
+                } else if (mark.type === "egress") {
                     vmLabel = vmLabel.replace('id=\'egress-circle\' style=\'width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle, #3498db, #3498db)', 'id=\'egress-circle\' style=\'width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle, #e74c3c, #e74c3c)');
                 }
             }
             
-            // Now add the chart line with the updated vmLabel
-            lines.push(`A((<strong>${data.attacker}</strong>)) --> B["${vmLabel}"]`);
+            // Now add the edge from Attacker to VM
+            lines.push(`A --> B`);
 
             // Add the attacker->VM edge to the edges array
             edges.push([attackerId, vmId]);
@@ -285,10 +312,10 @@
             attacker: "Attacker",
             vm: { name: "VM", ingress: "ingress", egress: "egress" },
             agents: [
-                { name: "Agent 1", llms: [{ name: "LLM1" }, { name: "LLM2" }, { name: "LLM3" }, { name: "LLM4" }] },
-                { name: "Agent 2", llms: [{ name: "LLM1" }] },
-                { name: "Agent 3", llms: [{ name: "LLM1" }, { name: "LLM2" }, { name: "LLM3" }] },
-                { name: "Agent 4", llms: [{ name: "LLM1" }, { name: "LLM4" }] },
+                { id: "Agent 1", llms: [{ id: "LLM1" }, { id: "LLM2" }, { id: "LLM3" }, { id: "LLM4" }] },
+                { id: "Agent 2", llms: [{ id: "LLM1" }] },
+                { id: "Agent 3", llms: [{ id: "LLM1" }, { id: "LLM2" }, { id: "LLM3" }] },
+                { id: "Agent 4", llms: [{ id: "LLM1" }, { id: "LLM4" }] },
             ]
         };
 
@@ -302,14 +329,19 @@
             } else {
                 // If no mark given, just generate default with no highlights
                 mermaidSource = generateMermaidWithMarkedPath(securityFlowData, {
-                    circle: null,
-                    agentName: null,
-                    llmName: null
+                    type: null,
+                    agentId: null,
+                    llmId: null
                 });
             }
 
-            // Set Mermaid source text
-            chartDiv.textContent = mermaidSource;
+            console.log('Generated Mermaid source:', mermaidSource);
+
+            // IMPORTANT: textContent overwrites the class attribute, so we need to preserve it
+            chartDiv.innerHTML = mermaidSource;
+            
+            // Ensure the mermaid class is preserved
+            chartDiv.className = 'mermaid';
 
             // Render Mermaid diagram
             mermaid.init(undefined, chartDiv);
@@ -319,12 +351,10 @@
 
         // On load, render default (no marked path)
         document.addEventListener("DOMContentLoaded", () => {
-            // renderMermaid()
-            renderMermaid({
-                circle: "ingress",
-                agentName: "Agent 3",
-                llmName: "LLM2"
-            });
+            // Small delay to ensure Mermaid is fully loaded
+            setTimeout(() => {
+                renderMermaid(); // Render default chart with no highlights
+            }, 100);
         });
     </script>
 </body>
