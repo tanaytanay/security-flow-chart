@@ -4,8 +4,8 @@
   "description": "Security flow chart with auto-refresh development server",
   "main": "index.html",
   "scripts": {
-    "start": "live-server --port=3000 --open=/index.html --watch=. --ignore=node_modules,.git,*.log",
-    "dev": "live-server --port=3000 --open=/index.html --watch=. --entry-file=index.html --ignore=node_modules,.git,*.log"
+    "start": "live-server --config=.live-server.json",
+    "dev": "live-server --config=.live-server.json"
   },
   "devDependencies": {
     "live-server": "^1.2.2"
