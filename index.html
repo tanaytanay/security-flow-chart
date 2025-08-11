@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Nodal Chart - Phase Tree</title>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
     <style>
@@ -13,22 +14,22 @@
             background-color: #f8f9fa;
             color: #333;
         }
-        
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
             background-color: white;
             padding: 30px;
             border-radius: 10px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
         }
-        
+
         h1 {
             color: #2c3e50;
             text-align: center;
             margin-bottom: 30px;
         }
-        
+
         .phase-info {
             background-color: #e8f4fd;
             padding: 20px;
@@ -36,12 +37,12 @@
             margin-bottom: 20px;
             border-left: 4px solid #3498db;
         }
-        
+
         .phase-info h3 {
             margin-top: 0;
             color: #2980b9;
         }
-        
+
         .mermaid {
             text-align: center;
             margin: 20px 0;
@@ -49,12 +50,12 @@
             background-color: #f8f9fa;
             border-radius: 8px;
         }
-        
+
         .controls {
             text-align: center;
             margin: 20px 0;
         }
-        
+
         .btn {
             background-color: #3498db;
             color: white;
@@ -65,21 +66,22 @@
             cursor: pointer;
             font-size: 14px;
         }
-        
+
         .btn:hover {
             background-color: #2980b9;
         }
-        
+
         .btn:disabled {
             background-color: #bdc3c7;
             cursor: not-allowed;
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <h1>Nodal Chart - Phase Tree Structure</h1>
-        
+
         <div class="phase-info">
             <h3>Phase Structure:</h3>
             <ul>
@@ -89,65 +91,14 @@
                 <li><strong>Phase 4:</strong> Each Phase 3 node can have 1-5 child nodes</li>
             </ul>
         </div>
-        
+
         <div class="controls">
             <button class="btn" onclick="resetToDefault()">Reset to Default</button>
         </div>
-        
-        <div class="mermaid" id="chart">
-            graph LR
-            A((<strong>Attacker</strong>)) --> B["<div style='text-align: center;'><strong>VM</strong><br/><div style='display: flex; flex-direction: column; align-items: center; gap: 10px;'><div id='ingress-circle' style='width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle, #3498db, #3498db); border: 2px solid #fff; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px;'>ingress</div><div id='egress-circle' style='width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle, #3498db, #3498db); border: 2px solid #fff; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px;'>egress</div></div></div>"]
-            B --> C1((Agent 1))
-            B --> C2((Agent 2))
-            B --> C3((Agent 3))
-            B --> C4((Agent 4))
-            C1 --> D1((<strong>LLM1</strong>))
-            C1 --> D2((<strong>LLM2</strong>))
-            C1 --> D8((<strong>LLM3</strong>))
-            C2 --> D3((<strong>LLM1</strong>))
-            C3 --> D4((<strong>LLM1</strong>))
-            C3 --> D5((<strong>LLM2</strong>))
-            C3 --> D6((<strong>LLM3</strong>))
-            C3 --> D7((<strong>LLM4</strong>))
-            C4 --> D9((<strong>LLM1</strong>))
-            
-            classDef phase1 fill: #3498db, color: #fff, stroke: #3498db
-            classDef phase2 fill: #a8a8a8, color: #fff, stroke: #a8a8a8
-    
 
-            classDef node-marked fill: #2ecc71, color: #fff, stroke: #2ecc71
-            classDef node-unmarked fill: #3498db, color: #fff, stroke: #3498db
+        <!-- Mermaid container - will be dynamically populated -->
+        <div class="mermaid" id="chart"></div>
 
-            classDef edge-marked stroke: #2ecc71, stroke-width: 3px
-            classDef edge-unmarked stroke: #000, stroke-width: 3px
-            
-            class A phase1
-            class B phase2
-            
-
-            class C1 node-unmarked
-            class C2 node-unmarked
-            class C3 node-marked
-            class C4 node-unmarked
-            
-            class D1 node-unmarked
-            class D2 node-unmarked
-            class D3 node-unmarked
-            class D4 node-unmarked
-            class D5 node-unmarked
-            class D6 node-unmarked
-            class D7 node-marked
-            class D8 node-unmarked
-            class D9 node-unmarked
-
-
-
-        </div>
-        
-   
-        
-
-        
         <div style="margin-top: 30px; padding: 20px; background-color: #f8f9fa; border-radius: 8px;">
             <h3>Custom HTML Node Examples</h3>
             <p>Mermaid.js supports limited HTML but you can create custom nodes with:</p>
@@ -156,27 +107,31 @@
                 <li><strong>Custom styling:</strong> Different colors, shapes, borders</li>
                 <li><strong>Node shapes:</strong> Circular, rectangular, and custom forms</li>
             </ul>
-            
+
             <div style="margin-top: 15px;">
                 <button class="btn" onclick="showCustomNodeExample()">Show Custom Node Example</button>
             </div>
-            
-            <div id="customExample" style="display: none; margin-top: 15px; padding: 15px; background: white; border-radius: 5px;">
+
+            <div id="customExample"
+                style="display: none; margin-top: 15px; padding: 15px; background: white; border-radius: 5px;">
                 <h4>Advanced Custom Node Example:</h4>
                 <div style="display: flex; gap: 20px; flex-wrap: wrap;">
-                    <div style="border: 2px solid #e74c3c; border-radius: 8px; padding: 15px; background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; text-align: center; min-width: 120px;">
+                    <div
+                        style="border: 2px solid #e74c3c; border-radius: 8px; padding: 15px; background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; text-align: center; min-width: 120px;">
                         <div style="font-size: 24px;">🚀</div>
                         <div style="font-weight: bold;">Custom Node</div>
                         <div style="font-size: 12px; opacity: 0.8;">With HTML</div>
                     </div>
-                    
-                    <div style="border: 2px solid #3498db; border-radius: 50%; padding: 20px; background: radial-gradient(circle, #3498db, #2980b9); color: white; text-align: center; min-width: 120px; min-height: 120px; display: flex; flex-direction: column; justify-content: center;">
+
+                    <div
+                        style="border: 2px solid #3498db; border-radius: 50%; padding: 20px; background: radial-gradient(circle, #3498db, #2980b9); color: white; text-align: center; min-width: 120px; min-height: 120px; display: flex; flex-direction: column; justify-content: center;">
                         <div style="font-size: 20px;">💡</div>
                         <div style="font-weight: bold;">Circular</div>
                         <div style="font-size: 10px;">Node</div>
                     </div>
-                    
-                    <div style="border: 2px solid #2ecc71; border-radius: 0; padding: 15px; background: #2ecc71; color: white; text-align: center; min-width: 120px; transform: rotate(-5deg);">
+
+                    <div
+                        style="border: 2px solid #2ecc71; border-radius: 0; padding: 15px; background: #2ecc71; color: white; text-align: center; min-width: 120px; transform: rotate(-5deg);">
                         <div style="font-size: 20px;">🎯</div>
                         <div style="font-weight: bold;">Angled</div>
                         <div style="font-size: 12px;">Target</div>
@@ -187,45 +142,20 @@
     </div>
 
     <script>
-        // Random tree generation removed - not needed
-        
-        // Reset to default tree
+        // Reset to default tree - reload page
         function resetToDefault() {
             location.reload();
         }
-        
-        // Show custom node examples
+
+        // Show/hide custom node examples
         function showCustomNodeExample() {
             const example = document.getElementById('customExample');
-            if (example.style.display === 'none') {
-                example.style.display = 'block';
-            } else {
-                example.style.display = 'none';
-            }
+            example.style.display = example.style.display === 'none' ? 'block' : 'none';
         }
-        
-        // Auto-refresh when file changes (for development)
-        let lastModified = Date.now();
-        setInterval(() => {
-            fetch(window.location.href, { method: 'HEAD' })
-                .then(response => {
-                    const lastModifiedHeader = response.headers.get('last-modified');
-                    if (lastModifiedHeader) {
-                        const modifiedTime = new Date(lastModifiedHeader).getTime();
-                        if (modifiedTime > lastModified) {
-                            lastModified = modifiedTime;
-                            location.reload();
-                        }
-                    }
-                })
-                .catch(() => {});
-        }, 2000);
-        
-                // Custom Phase 2 node overlay removed - using direct Mermaid customization instead
-        
-        // Initialize Mermaid
+
+        // Mermaid initialization config
         mermaid.initialize({
-            startOnLoad: true,
+            startOnLoad: false,  // we'll call mermaid.init() ourselves
             theme: 'default',
             flowchart: {
                 useMaxWidth: true,
@@ -235,8 +165,169 @@
                 rankSpacing: 200,
             }
         });
-        
 
+
+
+        // Generates Mermaid diagram source string with path marking
+        function generateMermaidWithMarkedPath(data, mark) {
+            const lines = ["graph LR"];
+
+            const nodeClasses = {};
+            const edges = [];
+
+            const attackerId = "A";
+            const vmId = "B";
+
+
+
+            // Create VM label with default blue colors
+            let vmLabel = `<div style='text-align: center;'><strong>${data.vm.name}</strong><br/><div style='display: flex; flex-direction: column; align-items: center; gap: 10px;'><div id='ingress-circle' style='width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle, #3498db, #3498db); border: 2px solid #fff; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px;'>ingress</div><div id='egress-circle' style='width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle, #3498db, #3498db); border: 2px solid #fff; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px;'>egress</div></div></div>`;
+
+            nodeClasses[attackerId] = "node-unmarked";
+            nodeClasses[vmId] = "node-unmarked";
+
+            data.agents.forEach((agent, ai) => {
+                const agentId = `C${ai + 1}`;
+                nodeClasses[agentId] = "node-unmarked";
+
+                edges.push([vmId, agentId]);
+                lines.push(`B --> ${agentId}((${agent.name}))`);
+
+                agent.llms.forEach((llm, li) => {
+                    const llmId = `D${ai + 1}_${li + 1}`;
+                    nodeClasses[llmId] = "node-unmarked";
+
+                    edges.push([agentId, llmId]);
+                    lines.push(`${agentId} --> ${llmId}((${llm.name}))`);
+                });
+            });
+
+            // Find IDs for marked nodes
+            let markedAgentId = null;
+            let markedLlmId = null;
+            data.agents.forEach((agent, ai) => {
+                if (agent.name === mark.agentName) {
+                    markedAgentId = `C${ai + 1}`;
+                    agent.llms.forEach((llm, li) => {
+                        if (llm.name === mark.llmName) {
+                            markedLlmId = `D${ai + 1}_${li + 1}`;
+                        }
+                    });
+                }
+            });
+
+            // Only mark nodes if we have a valid mark configuration AND all required nodes exist
+            const isValidMark = mark &&
+                (mark.circle === "ingress" || mark.circle === "egress") &&
+                markedAgentId &&
+                markedLlmId;
+
+            if (isValidMark) {
+                nodeClasses[attackerId] = "node-marked"; // Mark attacker
+                nodeClasses[markedAgentId] = "node-marked";
+                nodeClasses[markedLlmId] = "node-marked";
+                
+                // Update circle colors only when the entire path is valid
+                if (mark.circle === "ingress") {
+                    vmLabel = vmLabel.replace('id=\'ingress-circle\' style=\'width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle, #3498db, #3498db)', 'id=\'ingress-circle\' style=\'width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle, #2ecc71, #2ecc71)');
+                } else if (mark.circle === "egress") {
+                    vmLabel = vmLabel.replace('id=\'egress-circle\' style=\'width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle, #3498db, #3498db)', 'id=\'egress-circle\' style=\'width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle, #2ecc71, #2ecc71)');
+                }
+            }
+            
+            // Now add the chart line with the updated vmLabel
+            lines.push(`A((<strong>${data.attacker}</strong>)) --> B["${vmLabel}"]`);
+
+            // Add the attacker->VM edge to the edges array
+            edges.push([attackerId, vmId]);
+
+            // Mark edges on the path attacker->vm->agent->llm
+            const markedEdgesIndexes = [];
+            edges.forEach(([src, dst], i) => {
+                if (isValidMark && (
+                    (src === attackerId && dst === vmId) ||
+                    (src === vmId && dst === markedAgentId) ||
+                    (src === markedAgentId && dst === markedLlmId)
+                )) {
+                    markedEdgesIndexes.push(i);
+                }
+            });
+
+            lines.push("");
+            lines.push("classDef node-marked fill:#2ecc71,color:#fff,stroke:#2ecc71;");
+            lines.push("classDef node-unmarked fill:#3498db,color:#fff,stroke:#3498db;");
+            lines.push("classDef vm-node fill:#a8a8a8,color:#fff,stroke:#a8a8a8;");
+            lines.push("classDef edge-marked stroke:#2ecc71,stroke-width:3px;");
+            lines.push("classDef edge-unmarked stroke:#000,stroke-width:1px;");
+
+            // Always make node B (VM) gray
+            lines.push(`class B vm-node;`);
+
+            Object.entries(nodeClasses).forEach(([nodeId, cls]) => {
+                if (nodeId !== 'B') { // Skip B since we already styled it
+                    lines.push(`class ${nodeId} ${cls};`);
+                }
+            });
+
+            edges.forEach(([src, dst], i) => {
+                if (markedEdgesIndexes.includes(i)) {
+                    lines.push(`linkStyle ${i} stroke:#2ecc71,stroke-width:3px;`);
+                } else {
+                    lines.push(`linkStyle ${i} stroke:#000,stroke-width:1px;`);
+                }
+            });
+
+            return lines.join("\n");
+        }
+
+        // Your data
+        const securityFlowData = {
+            attacker: "Attacker",
+            vm: { name: "VM", ingress: "ingress", egress: "egress" },
+            agents: [
+                { name: "Agent 1", llms: [{ name: "LLM1" }, { name: "LLM2" }] },
+                { name: "Agent 2", llms: [{ name: "LLM1" }] },
+                { name: "Agent 3", llms: [{ name: "LLM1" }, { name: "LLM2" }, { name: "LLM3" }, { name: "LLM4" }] },
+                { name: "Agent 4", llms: [{ name: "LLM1" }] },
+                { name: "Agent 5", llms: [{ name: "LLM1" }, { name: "LLM4" }] },
+            ]
+        };
+
+        // Render the chart initially without any marked path
+        function renderMermaid(mark = null) {
+            const chartDiv = document.getElementById("chart");
+            let mermaidSource;
+
+            if (mark) {
+                mermaidSource = generateMermaidWithMarkedPath(securityFlowData, mark);
+            } else {
+                // If no mark given, just generate default with no highlights
+                mermaidSource = generateMermaidWithMarkedPath(securityFlowData, {
+                    circle: null,
+                    agentName: null,
+                    llmName: null
+                });
+            }
+
+            // Set Mermaid source text
+            chartDiv.textContent = mermaidSource;
+
+            // Render Mermaid diagram
+            mermaid.init(undefined, chartDiv);
+        }
+
+
+
+        // On load, render default (no marked path)
+        document.addEventListener("DOMContentLoaded", () => {
+            // renderMermaid()
+            renderMermaid({
+                circle: "egress",
+                agentName: "Agent 1",
+                llmName: "LLM2"
+            });
+        });
     </script>
 </body>
+
 </html>
