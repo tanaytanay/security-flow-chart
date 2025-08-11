@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Nodal Chart - Phase Tree</title>
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11.9.0/dist/mermaid.min.js"></script>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -229,9 +229,9 @@
                 
                 // Update circle colors only when the entire path is valid
                 if (mark.circle === "ingress") {
-                    vmLabel = vmLabel.replace('id=\'ingress-circle\' style=\'width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle, #3498db, #3498db)', 'id=\'ingress-circle\' style=\'width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle, #2ecc71, #2ecc71)');
+                    vmLabel = vmLabel.replace('id=\'ingress-circle\' style=\'width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle, #3498db, #3498db)', 'id=\'ingress-circle\' style=\'width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle, #e74c3c, #e74c3c)');
                 } else if (mark.circle === "egress") {
-                    vmLabel = vmLabel.replace('id=\'egress-circle\' style=\'width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle, #3498db, #3498db)', 'id=\'egress-circle\' style=\'width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle, #2ecc71, #2ecc71)');
+                    vmLabel = vmLabel.replace('id=\'egress-circle\' style=\'width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle, #3498db, #3498db)', 'id=\'egress-circle\' style=\'width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle, #e74c3c, #e74c3c)');
                 }
             }
             
@@ -254,10 +254,10 @@
             });
 
             lines.push("");
-            lines.push("classDef node-marked fill:#2ecc71,color:#fff,stroke:#2ecc71;");
+            lines.push("classDef node-marked fill:#e74c3c,color:#fff,stroke:#e74c3c;");
             lines.push("classDef node-unmarked fill:#3498db,color:#fff,stroke:#3498db;");
             lines.push("classDef vm-node fill:#a8a8a8,color:#fff,stroke:#a8a8a8;");
-            lines.push("classDef edge-marked stroke:#2ecc71,stroke-width:3px;");
+            lines.push("classDef edge-marked stroke:#e74c3c,stroke-width:3px;");
             lines.push("classDef edge-unmarked stroke:#000,stroke-width:1px;");
 
             // Always make node B (VM) gray
@@ -271,7 +271,7 @@
 
             edges.forEach(([src, dst], i) => {
                 if (markedEdgesIndexes.includes(i)) {
-                    lines.push(`linkStyle ${i} stroke:#2ecc71,stroke-width:3px;`);
+                    lines.push(`linkStyle ${i} stroke:#e74c3c,stroke-width:3px;`);
                 } else {
                     lines.push(`linkStyle ${i} stroke:#000,stroke-width:1px;`);
                 }
@@ -285,11 +285,10 @@
             attacker: "Attacker",
             vm: { name: "VM", ingress: "ingress", egress: "egress" },
             agents: [
-                { name: "Agent 1", llms: [{ name: "LLM1" }, { name: "LLM2" }] },
+                { name: "Agent 1", llms: [{ name: "LLM1" }, { name: "LLM2" }, { name: "LLM3" }, { name: "LLM4" }] },
                 { name: "Agent 2", llms: [{ name: "LLM1" }] },
-                { name: "Agent 3", llms: [{ name: "LLM1" }, { name: "LLM2" }, { name: "LLM3" }, { name: "LLM4" }] },
-                { name: "Agent 4", llms: [{ name: "LLM1" }] },
-                { name: "Agent 5", llms: [{ name: "LLM1" }, { name: "LLM4" }] },
+                { name: "Agent 3", llms: [{ name: "LLM1" }, { name: "LLM2" }, { name: "LLM3" }] },
+                { name: "Agent 4", llms: [{ name: "LLM1" }, { name: "LLM4" }] },
             ]
         };
 
@@ -322,8 +321,8 @@
         document.addEventListener("DOMContentLoaded", () => {
             // renderMermaid()
             renderMermaid({
-                circle: "egress",
-                agentName: "Agent 1",
+                circle: "ingress",
+                agentName: "Agent 3",
                 llmName: "LLM2"
             });
         });
