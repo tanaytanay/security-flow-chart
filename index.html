@@ -96,30 +96,52 @@
         
         <div class="mermaid" id="chart">
             graph LR
-                A((<strong>Attacker</strong>)) --> B["<div style='text-align: center;'><strong>VM</strong><br/><div style='display: flex; flex-direction: column; align-items: center; gap: 10px;'><div id='ingress-circle' style='width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle, #3498db, #3498db); border: 2px solid #fff; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px;'>ingress</div><div id='egress-circle' style='width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle, #3498db, #3498db); border: 2px solid #fff; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px;'>egress</div></div></div>"]
-                B --> C1((Agent 1))
-                B --> C2((Agent 2))
-                B --> C3((Agent 3))
-                B --> C4((Agent 4))
-                C1 --> D1((<strong>LLM1</strong>))
-                C1 --> D2((<strong>LLM2</strong>))
-                C1 --> D8((<strong>LLM3</strong>))
-                C2 --> D3((<strong>LLM1</strong>))
-                C3 --> D4((<strong>LLM1</strong>))
-                C3 --> D5((<strong>LLM2</strong>))
-                C3 --> D6((<strong>LLM3</strong>))
-                C3 --> D7((<strong>LLM4</strong>))
-                C4 --> D9((<strong>LLM1</strong>))
-                
-                classDef phase1 fill: #3498db, color: #fff
-                classDef phase2 fill: #a8a8a8, color: #fff
-                classDef phase3 fill: #3498db, color: #fff
-                classDef phase4 fill: #3498db, color: #fff
-                
-                class A phase1
-                class B phase2
-                class C1,C2,C3,C4 phase3
-                class D1,D2,D3,D4,D5,D6,D7,D8,D9 phase4
+            A((<strong>Attacker</strong>)) --> B["<div style='text-align: center;'><strong>VM</strong><br/><div style='display: flex; flex-direction: column; align-items: center; gap: 10px;'><div id='ingress-circle' style='width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle, #3498db, #3498db); border: 2px solid #fff; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px;'>ingress</div><div id='egress-circle' style='width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle, #3498db, #3498db); border: 2px solid #fff; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px;'>egress</div></div></div>"]
+            B --> C1((Agent 1))
+            B --> C2((Agent 2))
+            B --> C3((Agent 3))
+            B --> C4((Agent 4))
+            C1 --> D1((<strong>LLM1</strong>))
+            C1 --> D2((<strong>LLM2</strong>))
+            C1 --> D8((<strong>LLM3</strong>))
+            C2 --> D3((<strong>LLM1</strong>))
+            C3 --> D4((<strong>LLM1</strong>))
+            C3 --> D5((<strong>LLM2</strong>))
+            C3 --> D6((<strong>LLM3</strong>))
+            C3 --> D7((<strong>LLM4</strong>))
+            C4 --> D9((<strong>LLM1</strong>))
+            
+            classDef phase1 fill: #3498db, color: #fff, stroke: #3498db
+            classDef phase2 fill: #a8a8a8, color: #fff, stroke: #a8a8a8
+    
+
+            classDef node-marked fill: #2ecc71, color: #fff, stroke: #2ecc71
+            classDef node-unmarked fill: #3498db, color: #fff, stroke: #3498db
+
+            classDef edge-marked stroke: #2ecc71, stroke-width: 3px
+            classDef edge-unmarked stroke: #000, stroke-width: 3px
+            
+            class A phase1
+            class B phase2
+            
+
+            class C1 node-unmarked
+            class C2 node-unmarked
+            class C3 node-marked
+            class C4 node-unmarked
+            
+            class D1 node-unmarked
+            class D2 node-unmarked
+            class D3 node-unmarked
+            class D4 node-unmarked
+            class D5 node-unmarked
+            class D6 node-unmarked
+            class D7 node-marked
+            class D8 node-unmarked
+            class D9 node-unmarked
+
+
+
         </div>
         
    
