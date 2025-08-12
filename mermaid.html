@@ -4,7 +4,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Nodal Chart - Phase Tree</title>
   <script src="https://cdn.jsdelivr.net/npm/mermaid@11.9.0/dist/mermaid.min.js"></script>
   <style>
     body {
@@ -92,16 +91,15 @@
 
 <body>
   <div class="container">
-    <h1>Nodal Chart - Phase Tree Structure</h1>
 
     <div class="controls">
       <button class="btn btn-red"
-        onclick="renderMermaid({ circle: 'ingress', agentName: 'Agent 1', llmName: 'LLM3', color: '#e74c3c' })">Path 1 (Red)</button>
+        onclick="renderMermaid({ circle: 'ingress', agentName: 'Agent 1', llmName: 'LLM3', color: '#e74c3c' })">1</button>
       <button class="btn btn-orange"
-        onclick="renderMermaid({ circle: 'ingress', agentName: 'Agent 3', llmName: 'LLM2', color: '#e67e22' })">Path 2 (Orange)</button>
+        onclick="renderMermaid({ circle: 'ingress', agentName: 'Agent 3', llmName: 'LLM2', color: '#e67e22' })">2</button>
       <button class="btn btn-purple"
-        onclick="renderMermaid({ circle: 'egress', agentName: 'Agent 2', llmName: 'LLM1', color: '#9b59b6' })">Path 3 (Purple)</button>
-      <button class="btn btn-reset" onclick="resetToDefault()">Reset to Default</button>
+        onclick="renderMermaid({ circle: 'egress', agentName: 'Agent 2', llmName: 'LLM1', color: '#9b59b6' })">3</button>
+      <button class="btn btn-reset" onclick="resetToDefault()">None</button>
     </div>
 
     <div class="mermaid" id="chart"></div>
