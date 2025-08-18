@@ -1,546 +1,200 @@
 <!DOCTYPE html>
-<html lang="en">
-
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>D3 Hierarchy with Curved Edges Replica</title>
-  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0;
-      padding: 20px;
-      background-color: #f8f9fa;
-      color: #333;
-      user-select: none;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
-    }
-
-    h1 {
-      color: #2c3e50;
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .controls {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    button {
-      font-weight: bold;
-      border: none;
-      padding: 10px 20px;
-      margin: 5px;
-      border-radius: 5px;
-      cursor: pointer;
-      color: white;
-      font-size: 14px;
-      transition: background-color 0.3s ease;
-    }
-
-    button.red {
-      background-color: #e74c3c;
-    }
-
-    button.red:hover {
-      background-color: #c0392b;
-    }
-
-    button.orange {
-      background-color: #e67e22;
-    }
-
-    button.orange:hover {
-      background-color: #d35400;
-    }
-
-    button.purple {
-      background-color: #9b59b6;
-    }
-
-    button.purple:hover {
-      background-color: #8e44ad;
-    }
-
-    button.reset {
-      background-color: #3498db;
-    }
-
-    button.reset:hover {
-      background-color: #2980b9;
-    }
-
-    svg {
-      background: #f8f9fa;
-      border-radius: 8px;
-      overflow: visible;
-    }
-
-    /* Node styling */
-    .node-rect {
-      fill: #3498db;
-      stroke: #2980b9;
-      stroke-width: 2px;
-      rx: 6;
-      ry: 6;
-    }
-
-    .node-rect.highlight {
-      stroke-width: 3px;
-      stroke: currentColor;
-      fill-opacity: 0.85;
-    }
-
-    .node-text {
-      fill: white;
-      font-weight: bold;
-      pointer-events: none;
-      user-select: none;
-    }
-
-    /* Attacker node style */
-    .node-attacker {
-      fill: #e74c3c;
-      stroke: #c0392b;
-      stroke-width: 2px;
-    }
-
-    .node-attacker.highlight {
-      stroke-width: 3px;
-      stroke: currentColor;
-    }
-
-    /* VM node style */
-    .node-vm-rect {
-      fill: #a8a8a8;
-      stroke: #7f7f7f;
-      stroke-width: 2px;
-      rx: 8;
-      ry: 8;
-    }
-
-    .node-vm-rect.highlight {
-      stroke-width: 3px;
-      stroke: currentColor;
-    }
-
-    /* Circles inside VM */
-    .vm-circle {
-      fill: #3498db;
-      stroke: white;
-      stroke-width: 2px;
-    }
-
-    .vm-circle.highlight {
-      fill: currentColor;
-      stroke: white;
-      stroke-width: 3px;
-    }
-
-    .vm-circle-text {
-      fill: white;
-      font-size: 12px;
-      font-weight: bold;
-      pointer-events: none;
-      user-select: none;
-    }
-
-    /* Agent node style */
-    .node-agent {
-      fill: #3498db;
-      stroke: #2980b9;
-      stroke-width: 2px;
-      rx: 6;
-      ry: 6;
-    }
-
-    .node-agent.highlight {
-      stroke-width: 3px;
-      stroke: currentColor;
-      fill-opacity: 0.85;
-    }
-
-    /* LLM node style */
-    .node-llm {
-      fill: #3498db;
-      stroke: #2980b9;
-      stroke-width: 2px;
-    }
-
-    .node-llm.highlight {
-      stroke-width: 3px;
-      stroke: currentColor;
-      fill-opacity: 0.85;
-    }
-
-    /* Edges */
-    .link {
-      fill: none;
-      stroke: #000;
-      stroke-width: 1.5px;
-      transition: stroke 0.3s, stroke-width 0.3s;
-    }
-
-    .link.highlight {
-      stroke-width: 3px;
-      stroke: currentColor;
-    }
-
-    /* Arrowhead */
-    marker#arrowhead path {
-      fill: #000;
-      stroke: none;
-    }
-
-    marker#arrowhead.highlight path {
-      fill: currentColor;
-    }
-  </style>
-</head>
-
+<meta charset="utf-8">
 <body>
-  <div class="container">
-    <h1>D3 Hierarchy with Smooth Curved Edges</h1>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+const width = 1000;
+const height = 500;
 
-    <div class="controls">
-      <button class="red" onclick="highlightPath('path1')">Path 1 (Red)</button>
-      <button class="orange" onclick="highlightPath('path2')">Path 2 (Orange)</button>
-      <button class="purple" onclick="highlightPath('path3')">Path 3 (Purple)</button>
-      <button class="reset" onclick="highlightPath(null)">Reset</button>
-    </div>
-
-    <svg id="chart" width="1200" height="500"></svg>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
-  <script>
-    // Exact JSON data you provided
-    const data = {
-      attacker: "Attacker",
-      vm: { name: "VM", ingress: "ingress", egress: "egress" },
-      agents: [
-        { name: "Agent 1", llms: [{ name: "LLM1" }, { name: "LLM2" }, { name: "LLM3" }, { name: "LLM4" }] },
-        { name: "Agent 2", llms: [{ name: "LLM1" }] },
-        { name: "Agent 3", llms: [{ name: "LLM1" }, { name: "LLM2" }, { name: "LLM3" }] },
-        { name: "Agent 4", llms: [{ name: "LLM1" }, { name: "LLM2" }] }
-      ]
-    };
-
-    const svg = d3.select("#chart");
-    const width = +svg.attr("width");
-    const height = +svg.attr("height");
-
-    // Marker for arrowheads
-    svg.append("defs").append("marker")
-      .attr("id", "arrowhead")
-      .attr("viewBox", "-0 -5 10 10")
-      .attr("refX", 20)
-      .attr("refY", 0)
-      .attr("orient", "auto")
-      .attr("markerWidth", 7)
-      .attr("markerHeight", 7)
-      .attr("xoverflow", "visible")
-      .append("path")
-      .attr("d", "M 0,-5 L 10 ,0 L 0,5")
-      .attr("fill", "#000");
-
-    // Helper to build the hierarchy structure similar to Mermaid:
-    // Attacker (root)
-    // -> VM (single child)
-    // -> Agents (children)
-    // -> LLMs (children)
-
-    // Construct tree data for d3.hierarchy
-    // VM and its ingress/egress are inside one node (special rendering)
-    // So hierarchy nodes: attacker -> vm -> agents -> llms
-
-    // We'll build a tree with root attacker:
-    const treeData = {
-      name: data.attacker,
-      type: "attacker",
+// Hierarchical version of your data
+const hierarchyData = {
+  name: "Attacker",
+  type: "attacker",
+  children: [
+    {
+      name: "VM",
+      type: "vm",
       children: [
+        { name: "ingress", type: "ingress-circle" },
+        { name: "egress", type: "egress-circle" },
         {
-          name: data.vm.name,
-          type: "vm",
-          children: data.agents.map(agent => ({
-            name: agent.name,
-            type: "agent",
-            children: agent.llms.map(llm => ({
-              name: llm.name,
-              type: "llm"
-            }))
-          }))
+          name: "Agent 1",
+          type: "agent",
+          children: [
+            { name: "LLM1", type: "llm" },
+            { name: "LLM2", type: "llm" },
+            { name: "LLM3", type: "llm" },
+            { name: "LLM4", type: "llm" }
+          ]
+        },
+        {
+          name: "Agent 2",
+          type: "agent",
+          children: [{ name: "LLM1", type: "llm" }]
+        },
+        {
+          name: "Agent 3",
+          type: "agent",
+          children: [
+            { name: "LLM1", type: "llm" },
+            { name: "LLM2", type: "llm" },
+            { name: "LLM3", type: "llm" }
+          ]
         }
       ]
-    };
-
-    // Setup tree layout
-    const treeLayout = d3.tree()
-      .size([height - 100, width - 300]) // width reduced to allow text spacing
-      .separation((a, b) => (a.parent === b.parent ? 1 : 1.5));
-
-    // Generate root hierarchy node
-    const root = d3.hierarchy(treeData);
-
-    // Run layout to compute positions
-    treeLayout(root);
-
-    // Color config for highlights
-    const colors = {
-      red: "#e74c3c",
-      orange: "#e67e22",
-      purple: "#9b59b6"
-    };
-
-    // Validate path to highlight is valid, same logic as before
-    function validatePath(path) {
-      if (!path) return false;
-      const { circle, agentName, llmName } = path;
-      if (circle !== "ingress" && circle !== "egress") return false;
-      const agent = data.agents.find(a => a.name === agentName);
-      if (!agent) return false;
-      const llm = agent.llms.find(l => l.name === llmName);
-      if (!llm) return false;
-      return true;
     }
+  ]
+};
 
-    function clearHighlights() {
-      svg.selectAll(".link").classed("highlight", false).attr("stroke", "#000").attr("stroke-width", 1.5);
-      svg.selectAll(".node-rect, .node-circle, .node-attacker, .node-vm-rect, .vm-circle").classed("highlight", false).style("stroke-width", 2).style("fill-opacity", 1);
-      svg.selectAll(".vm-circle").style("fill", "#3498db").style("stroke-width", 2);
-      svg.selectAll(".node-attacker").style("stroke-width", 2).style("stroke", "#c0392b").style("fill", "#e74c3c");
-      svg.selectAll(".node-vm-rect").style("stroke-width", 2).style("stroke", "#7f7f7f").style("fill", "#a8a8a8");
+// Highlight config
+const highlight = {
+  circle: "ingress",
+  agentName: "Agent 1",
+  llmName: "LLM3",
+  color: "#e74c3c"
+};
+
+const root = d3.hierarchy(hierarchyData);
+
+// Filter out ingress/egress for layout
+const filteredRoot = d3.hierarchy(hierarchyData);
+filteredRoot.descendants().forEach(node => {
+  if (node.data.type === "ingress-circle" || node.data.type === "egress-circle") {
+    const parent = node.parent;
+    if (parent) {
+      parent.children = parent.children.filter(child => child !== node);
     }
+  }
+});
 
-    // Main draw function, highlights a path if given
-    function drawChart(highlightPath) {
-      svg.selectAll("*").remove();
+const treeLayout = d3.tree().size([height, width - 200]);
+treeLayout(filteredRoot);
 
-      // Re-add arrowhead marker
-      svg.append("defs").append("marker")
-        .attr("id", "arrowhead")
-        .attr("viewBox", "-0 -5 10 10")
-        .attr("refX", 20)
-        .attr("refY", 0)
-        .attr("orient", "auto")
-        .attr("markerWidth", 7)
-        .attr("markerHeight", 7)
-        .attr("xoverflow", "visible")
-        .append("path")
-        .attr("d", "M 0,-5 L 10 ,0 L 0,5")
-        .attr("fill", "#000");
+// SVG
+const svg = d3.select("body").append("svg")
+  .attr("width", width)
+  .attr("height", height);
 
-      const validHighlight = validatePath(highlightPath);
-      const color = validHighlight ? highlightPath.color : null;
+// Define arrow marker
+svg.append("defs").append("marker")
+  .attr("id", "arrowhead")
+  .attr("viewBox", "0 -5 10 10")
+  .attr("refX", 10)
+  .attr("refY", 0)
+  .attr("markerWidth", 6)
+  .attr("markerHeight", 6)
+  .attr("orient", "auto")
+  .append("path")
+  .attr("d", "M0,-5L10,0L0,5")
+  .attr("fill", "#000");
 
-      // We'll convert d3's (x,y) to (y,x) because we want a left-to-right tree,
-      // but d3.tree by default arranges top-to-bottom, so swap coords accordingly.
+// Group for layout
+const g = svg.append("g")
+  .attr("transform", "translate(50,0)");
 
-      // Links (edges)
-      const linkGenerator = d3.linkHorizontal()
-        .x(d => d.y)
-        .y(d => d.x);
+// Links
+g.selectAll(".link")
+  .data(filteredRoot.links())
+  .enter()
+  .append("path")
+  .attr("fill", "none")
+  .attr("stroke", d => isHighlightedEdge(d) ? highlight.color : "#000")
+  .attr("stroke-width", d => isHighlightedEdge(d) ? 3 : 1)
+  .attr("marker-end", "url(#arrowhead)")
+  .attr("d", d3.linkHorizontal()
+    .x(d => d.y)
+    .y(d => d.x)
+  );
 
-      // Draw edges
-      svg.selectAll(".link")
-        .data(root.links())
-        .join("path")
-        .attr("class", "link")
-        .attr("d", d => linkGenerator({
-          source: { x: d.source.x, y: d.source.y },
-          target: { x: d.target.x, y: d.target.y }
-        }))
-        .attr("fill", "none")
-        .attr("stroke", d => {
-          if (!validHighlight) return "#000";
-          // Highlight edges on the path attacker->vm->agent->llm if matching highlightPath
-          if (highlightPath) {
-            const s = d.source.data;
-            const t = d.target.data;
-            if (s.type === "attacker" && t.type === "vm") return color;
-            if (s.type === "vm" && t.type === "agent" && t.name === highlightPath.agentName) return color;
-            if (s.type === "agent" && t.type === "llm" && s.name === highlightPath.agentName && t.name === highlightPath.llmName) return color;
-          }
-          return "#000";
-        })
-        .attr("stroke-width", d => {
-          if (!validHighlight) return 1.5;
-          const s = d.source.data;
-          const t = d.target.data;
-          if (highlightPath) {
-            if (s.type === "attacker" && t.type === "vm") return 3;
-            if (s.type === "vm" && t.type === "agent" && t.name === highlightPath.agentName) return 3;
-            if (s.type === "agent" && t.type === "llm" && s.name === highlightPath.agentName && t.name === highlightPath.llmName) return 3;
-          }
-          return 1.5;
-        })
-        .attr("marker-end", "url(#arrowhead)");
+// Nodes
+const node = g.selectAll(".node")
+  .data(filteredRoot.descendants())
+  .enter()
+  .append("g")
+  .attr("class", "node")
+  .attr("transform", d => `translate(${d.y},${d.x})`);
 
-      // Draw nodes
+node.each(function(d) {
+  if (d.data.type === "vm") {
+    d3.select(this).append("rect")
+      .attr("x", -60)
+      .attr("y", -40)
+      .attr("width", 120)
+      .attr("height", 80)
+      .attr("fill", "#a8a8a8")
+      .attr("stroke", "#888");
 
-      // 1. Attacker node as circle
-      const attackerNode = svg.append("g")
-        .attr("transform", `translate(${root.x},${root.y})`)
-        .attr("transform", `translate(${root.y},${root.x})`);
+    d3.select(this).append("text")
+      .attr("dy", -15)
+      .attr("text-anchor", "middle")
+      .attr("font-weight", "bold")
+      .text(d.data.name);
 
-      svg.append("circle")
-        .attr("class", "node-attacker" + (validHighlight ? " highlight" : ""))
-        .attr("r", 20)
-        .attr("cx", root.y)
-        .attr("cy", root.x)
-        .style("stroke", validHighlight ? color : "#c0392b")
-        .style("fill", validHighlight ? color : "#e74c3c")
-        .style("stroke-width", validHighlight ? 3 : 2);
+    // ingress circle inside VM
+    d3.select(this).append("circle")
+      .attr("r", 15)
+      .attr("cx", -30)
+      .attr("cy", -10)
+      .attr("fill", highlight.circle === "ingress" ? highlight.color : "#3498db")
+      .attr("stroke", "#fff");
 
-      svg.append("text")
-        .attr("x", root.y)
-        .attr("y", root.x + 5)
-        .attr("text-anchor", "middle")
-        .attr("class", "node-text")
-        .text(root.data.name);
+    d3.select(this).append("text")
+      .attr("x", -30)
+      .attr("y", -5)
+      .attr("text-anchor", "middle")
+      .attr("fill", "#fff")
+      .attr("font-size", "10px")
+      .text("ingress");
 
-      // 2. VM node as rectangle with ingress/egress circles inside
-      const vmNode = root.children[0];
-      const vmX = vmNode.y;
-      const vmY = vmNode.x;
-      const vmWidth = 140;
-      const vmHeight = 110;
+    // egress circle inside VM
+    d3.select(this).append("circle")
+      .attr("r", 15)
+      .attr("cx", 30)
+      .attr("cy", -10)
+      .attr("fill", highlight.circle === "egress" ? highlight.color : "#3498db")
+      .attr("stroke", "#fff");
 
-      svg.append("rect")
-        .attr("class", "node-vm-rect" + (validHighlight ? " highlight" : ""))
-        .attr("x", vmX - 10)
-        .attr("y", vmY - vmHeight / 2)
-        .attr("width", vmWidth)
-        .attr("height", vmHeight)
-        .style("stroke", validHighlight ? color : "#7f7f7f")
-        .style("fill", "#a8a8a8")
-        .style("stroke-width", validHighlight ? 3 : 2)
-        .attr("rx", 8)
-        .attr("ry", 8);
+    d3.select(this).append("text")
+      .attr("x", 30)
+      .attr("y", -5)
+      .attr("text-anchor", "middle")
+      .attr("fill", "#fff")
+      .attr("font-size", "10px")
+      .text("egress");
 
-      // VM label text
-      svg.append("text")
-        .attr("x", vmX + vmWidth / 2 - 10)
-        .attr("y", vmY - vmHeight / 2 + 22)
-        .attr("text-anchor", "middle")
-        .attr("class", "node-text")
-        .text(vmNode.data.name);
+  } else {
+    d3.select(this).append("circle")
+      .attr("r", d.data.type === "attacker" ? 25 : d.data.type === "agent" ? 22 : 20)
+      .attr("fill", isHighlightedNode(d) ? highlight.color : "#3498db")
+      .attr("stroke", "#fff");
 
-      // Ingress circle inside VM
-      const ingressCircleColor = validHighlight && highlightPath.circle === "ingress" ? color : "#3498db";
-      svg.append("circle")
-        .attr("class", "vm-circle" + (validHighlight && highlightPath.circle === "ingress" ? " highlight" : ""))
-        .attr("cx", vmX + vmWidth / 2 - 10)
-        .attr("cy", vmY - 20)
-        .attr("r", 25)
-        .style("fill", ingressCircleColor)
-        .style("stroke-width", validHighlight && highlightPath.circle === "ingress" ? 3 : 2);
+    d3.select(this).append("text")
+      .attr("dy", 4)
+      .attr("text-anchor", "middle")
+      .attr("fill", "#fff")
+      .attr("font-size", d.data.type === "attacker" ? "12px" : d.data.type === "agent" ? "11px" : "10px")
+      .text(d.data.name);
+  }
+});
 
-      svg.append("text")
-        .attr("x", vmX + vmWidth / 2 - 10)
-        .attr("y", vmY - 20 + 5)
-        .attr("class", "vm-circle-text")
-        .attr("text-anchor", "middle")
-        .text("ingress");
+// --- Highlight helpers ---
+function isHighlightedNode(d) {
+  return (
+    d.data.name === "Attacker" ||
+    d.data.name === "VM" ||
+    d.data.name === highlight.agentName ||
+    d.data.name === highlight.llmName
+  );
+}
 
-      // Egress circle inside VM
-      const egressCircleColor = validHighlight && highlightPath.circle === "egress" ? color : "#3498db";
-      svg.append("circle")
-        .attr("class", "vm-circle" + (validHighlight && highlightPath.circle === "egress" ? " highlight" : ""))
-        .attr("cx", vmX + vmWidth / 2 - 10)
-        .attr("cy", vmY + 30)
-        .attr("r", 25)
-        .style("fill", egressCircleColor)
-        .style("stroke-width", validHighlight && highlightPath.circle === "egress" ? 3 : 2);
-
-      svg.append("text")
-        .attr("x", vmX + vmWidth / 2 - 10)
-        .attr("y", vmY + 30 + 5)
-        .attr("class", "vm-circle-text")
-        .attr("text-anchor", "middle")
-        .text("egress");
-
-      // 3. Agents nodes as rectangles
-      vmNode.children.forEach(agentNode => {
-        const x = agentNode.y;
-        const y = agentNode.x;
-        const width = 100;
-        const height = 40;
-
-        const isHighlightedAgent = validHighlight && highlightPath.agentName === agentNode.data.name;
-
-        svg.append("rect")
-          .attr("x", x - 10)
-          .attr("y", y - height / 2)
-          .attr("width", width)
-          .attr("height", height)
-          .attr("rx", 6)
-          .attr("ry", 6)
-          .attr("class", "node-agent" + (isHighlightedAgent ? " highlight" : ""))
-          .style("stroke", isHighlightedAgent ? color : "#2980b9")
-          .style("fill", isHighlightedAgent ? color : "#3498db")
-          .style("stroke-width", isHighlightedAgent ? 3 : 2);
-
-        svg.append("text")
-          .attr("x", x + width / 2 - 10)
-          .attr("y", y + 6)
-          .attr("class", "node-text")
-          .attr("text-anchor", "middle")
-          .text(agentNode.data.name);
-
-        // 4. LLM nodes as circles connected to agents
-        agentNode.children.forEach(llmNode => {
-          const llmX = llmNode.y;
-          const llmY = llmNode.x;
-
-          const isHighlightedLLM = validHighlight && highlightPath.agentName === agentNode.data.name && highlightPath.llmName === llmNode.data.name;
-
-          svg.append("circle")
-            .attr("cx", llmX)
-            .attr("cy", llmY)
-            .attr("r", 20)
-            .attr("class", "node-llm" + (isHighlightedLLM ? " highlight" : ""))
-            .style("stroke", isHighlightedLLM ? color : "#2980b9")
-            .style("fill", isHighlightedLLM ? color : "#3498db")
-            .style("stroke-width", isHighlightedLLM ? 3 : 2);
-
-          svg.append("text")
-            .attr("x", llmX)
-            .attr("y", llmY + 5)
-            .attr("class", "node-text")
-            .attr("text-anchor", "middle")
-            .text(llmNode.data.name);
-        });
-      });
-    }
-
-    // Highlight path handler
-    function highlightPath(name) {
-      const paths = {
-        path1: { circle: "ingress", agentName: "Agent 1", llmName: "LLM3", color: "#e74c3c" },
-        path2: { circle: "ingress", agentName: "Agent 3", llmName: "LLM2", color: "#e67e22" },
-        path3: { circle: "egress", agentName: "Agent 2", llmName: "LLM1", color: "#9b59b6" }
-      };
-      if (!name) {
-        drawChart(null);
-      } else {
-        drawChart(paths[name] || null);
-      }
-    }
-
-    // Initial render on load
-    drawChart(null);
-  </script>
-</body>
-
-</html>
+function isHighlightedEdge(link) {
+  const pathSequence = [
+    ["Attacker", "VM"],
+    ["VM", highlight.agentName],
+    [highlight.agentName, highlight.llmName]
+  ];
+  return pathSequence.some(([src, dst]) =>
+    link.source.data.name === src && link.target.data.name === dst
+  );
+}
+</script>
