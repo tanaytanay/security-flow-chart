@@ -78,34 +78,23 @@ const node = svg.selectAll("g")
   )
   .on("click", (event, d) => {
     if (!hubs.includes(d)) childClicked(d);
-  });
-
-// --- Add circles with hub/child colors and stroke width 1 ---
-node.append("circle")
-  .attr("r", d => hubs.includes(d) ? 40 : 30)
-  .attr("fill", d => hubs.includes(d) ? "#79c7b0" : "#FFA07A")
-  .attr("stroke", "#000")
-  .attr("stroke-width", 1)
-  // --- Hub hover effect ---
+  })
+  // --- Hover handler moved to <g> ---
   .on("mouseover", function(event, d) {
     if (!hubs.includes(d)) return;
 
-    // find connected children
     const connectedChildren = links
       .filter(l => l.source === d.id)
       .map(l => l.target);
 
-    // highlight connected links red, others gray
     link.attr("stroke", l => l.source === d.id ? "red" : "#ccc");
 
-    // hubs: only hovered hub keeps color, others gray
     node.select("circle").attr("fill", n => {
       if (n === d) return "#79c7b0";
-      if (!hubs.includes(n) && connectedChildren.includes(n.id)) return n === d ? "#79c7b0" : "#db7163"; // connected children keep color
-      return "#ccc"; // other nodes gray
+      if (!hubs.includes(n) && connectedChildren.includes(n.id)) return "#FFA07A"; // connected children keep color
+      return "#ccc";
     });
 
-    // dim all text for unconnected nodes
     node.select("text").attr("fill", n => {
       if (n === d) return "#000";
       if (!hubs.includes(n) && connectedChildren.includes(n.id)) return "#000"; // connected children text stays
@@ -113,11 +102,17 @@ node.append("circle")
     });
   })
   .on("mouseout", function(event, d) {
-    // restore original colors
     link.attr("stroke", "#333");
     node.select("circle").attr("fill", n => hubs.includes(n) ? "#79c7b0" : "#FFA07A");
     node.select("text").attr("fill", "#000");
   });
+
+// --- Add circles with hub/child colors and stroke width 1 ---
+node.append("circle")
+  .attr("r", d => hubs.includes(d) ? 40 : 30)
+  .attr("fill", d => hubs.includes(d) ? "#79c7b0" : "#FFA07A")
+  .attr("stroke", "#000")
+  .attr("stroke-width", 1);
 
 // --- Add icon and label dynamically inside circle ---
 node.each(function(d) {
