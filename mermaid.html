@@ -124,6 +124,24 @@
       }
     });
 
+    function hexToRgb(hex) {
+      // Remove leading "#" if present
+      hex = hex.replace(/^#/, '');
+
+      // Handle shorthand hex (#fff)
+      if (hex.length === 3) {
+        hex = hex.split('').map(c => c + c).join('');
+      }
+
+      // Parse the hex values
+      const bigint = parseInt(hex, 16);
+      const r = (bigint >> 16) & 255;
+      const g = (bigint >> 8) & 255;
+      const b = bigint & 255;
+
+      return `rgb(${r}, ${g}, ${b})`;
+    }
+
     // Generate Mermaid diagram source with path marking and custom colors
     function generateMermaidWithMarkedPath(data, mark) {
       const lines = ["graph LR"];
@@ -134,9 +152,9 @@
       const attackerId = "A";
       const vmId = "B";
 
-      // Default VM circle colors
-      const ingressDefault = "#3498db";
-      const egressDefault = "#3498db";
+      // Default VM circle colors (transparent by default)
+      const ingressDefault = "transparent";
+      const egressDefault = "transparent";
 
       // Use custom color if given, else fallback to blue
       const highlightColor = mark && mark.color ? mark.color : ingressDefault;
@@ -144,18 +162,28 @@
       // Build VM label with circles colored appropriately
       let ingressBg = ingressDefault;
       let egressBg = egressDefault;
+      let ingressBorder = '#3498db';
+      let egressBorder = '#3498db';
 
       if (mark && mark.circle === "ingress") {
         ingressBg = highlightColor;
+        ingressBorder = highlightColor;
       } else if (mark && mark.circle === "egress") {
         egressBg = highlightColor;
+        egressBorder = highlightColor;
       }
+
+      ingressBorder = hexToRgb(ingressBorder);
+      egressBorder = hexToRgb(egressBorder);
+
+      console.log("ingressBorder:", ingressBorder, typeof ingressBorder);
+      console.log("egressBorder:", egressBorder, typeof egressBorder);
 
       let vmLabel = `<div style='text-align: center;'>
         <strong>${data.vm.name}</strong><br/>
         <div style='display: flex; flex-direction: column; align-items: center; gap: 10px;'>
-          <div id='ingress-circle' style='width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle, ${ingressBg}, ${ingressBg}); border: 2px solid #fff; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px;'>ingress</div>
-          <div id='egress-circle' style='width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle, ${egressBg}, ${egressBg}); border: 2px solid #fff; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px;'>egress</div>
+          <div id='ingress-circle' style='width: 60px; height: 60px; border-radius: 50%; background: transparent; border: 1px solid ${ingressBorder}; display: flex; align-items: center; justify-content: center; color: black; font-weight: bold; font-size: 12px;'>ingress</div>
+          <div id='egress-circle' style='width: 60px; height: 60px; border-radius: 50%; background: transparent; border: 1px solid ${egressBorder}; display: flex; align-items: center; justify-content: center; color: black; font-weight: bold; font-size: 12px;'>egress</div>
         </div>
       </div>`;
 
@@ -221,9 +249,9 @@
       });
 
       lines.push("");
-      lines.push(`classDef node-marked fill:${highlightColor},color:#fff,stroke:${highlightColor};`);
-      lines.push("classDef node-unmarked fill:#3498db,color:#fff,stroke:#3498db;");
-      lines.push("classDef vm-node fill:#a8a8a8,color:#fff,stroke:#a8a8a8;");
+      lines.push(`classDef node-marked fill:transparent,color:#000,stroke:${highlightColor};`);
+      lines.push("classDef node-unmarked fill:transparent,color:#000,stroke:#3498db;");
+      lines.push("classDef vm-node fill:transparent,color:#000,stroke:#a8a8a8;");
       lines.push(`classDef edge-marked stroke:${highlightColor},stroke-width:3px;`);
       lines.push("classDef edge-unmarked stroke:#000,stroke-width:1px;");
 
