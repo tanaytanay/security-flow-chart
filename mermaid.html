@@ -94,11 +94,11 @@
 
     <div class="controls">
       <button class="btn btn-red"
-        onclick="renderMermaid({ circle: 'ingress', agentName: 'Agent 1', llmName: 'Claude', color: '#e74c3c' })">1</button>
+        onclick="renderMermaid({ circle: 'ingress', agentName: 'API', llmName: 'Claude', color: '#e74c3c' })">1</button>
       <button class="btn btn-orange"
-        onclick="renderMermaid({ circle: 'ingress', agentName: 'Agent 2', llmName: 'Gemini', color: '#e67e22' })">2</button>
+        onclick="renderMermaid({ circle: 'ingress', agentName: 'AI bot', llmName: 'Gemini', color: '#e67e22' })">2</button>
       <button class="btn btn-purple"
-        onclick="renderMermaid({ circle: 'egress', agentName: 'Agent 3', llmName: 'OpenAI', color: '#9b59b6' })">3</button>
+        onclick="renderMermaid({ circle: 'egress', agentName: 'Chatbot', llmName: 'OpenAI', color: '#9b59b6' })">3</button>
       <button class="btn btn-reset" onclick="resetToDefault()">None</button>
     </div>
 
@@ -195,7 +195,7 @@
         nodeClasses[agentId] = "node-unmarked";
 
         edges.push([vmId, agentId]);
-        lines.push(`B --> ${agentId}((${agent.name}))`);
+        lines.push(`B --> ${agentId}((<img src="${agent.icon}" width="72" height="72" style="vertical-align: middle; margin-right: 3px; object-fit: contain;"/>${agent.name}))`);
 
         agent.llms.forEach((llm, li) => {
           const llmId = `D${ai + 1}_${li + 1}`;
@@ -280,9 +280,9 @@
       attacker: "Attacker",
       vm: { name: "VM", ingress: "ingress", egress: "egress" },
       agents: [
-        { name: "Agent 1", llms: [{ name: "Gemini", icon: "icons/gemini.png" }, { name: "Claude", icon: "icons/claude.png" }] },
-        { name: "Agent 2", llms: [{ name: "Gemini", icon: "icons/gemini.png" }] },
-        { name: "Agent 3", llms: [{ name: "Claude", icon: "icons/claude.png" }, { name: "OpenAI", icon: "icons/openai.png" }, { name: "Gemini", icon: "icons/gemini.png" }] },
+        { name: "API", icon: "icons/apiBot.png",llms: [{ name: "Gemini", icon: "icons/gemini.png" }, { name: "Claude", icon: "icons/claude.png" }] },
+        { name: "AI bot", icon: "icons/aiBot.png",llms: [{ name: "Gemini", icon: "icons/gemini.png" }] },
+        { name: "Chatbot", icon: "icons/chatbot.png",llms: [{ name: "Claude", icon: "icons/claude.png" }, { name: "OpenAI", icon: "icons/openai.png" }, { name: "Gemini", icon: "icons/gemini.png" }] },
       ]
     };
 
