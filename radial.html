@@ -1,194 +1,126 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <body>
-<svg width="1800" height="1000"></svg>
+<svg width="800" height="600"></svg>
 <script src="https://d3js.org/d3.v7.min.js"></script>
 <script>
-const width = 1800, height = 1000;
-const hubPadding = 100; // distance from hub center to first attackers
+const svg = d3.select("svg");
+const width = +svg.attr("width");
+const height = +svg.attr("height");
 
-// Example scalable JSON with 2 hubs (you can add more)
-const hubsData = [
-  {
-    id: "Hub1",
-    label: "1",
-    attackers: [
-      {id:"att1", label:"Attacker 1"},
-      {id:"att2", label:"Attacker 2"},
-      {id:"att3", label:"Attacker 3"},
-      {id:"att4", label:"Attacker 4"},
-      {id:"att5", label:"Attacker 5"},
-      {id:"att6", label:"Attacker 6"}, // common with Hub 2
-      {id:"att7", label:"Attacker 7"}, // common with Hub 2
-      {id:"att8", label:"Attacker 8"}  // common with Hub 2
-    ]
-  },
-  {
-    id: "Hub2",
-    label: "2",
-    attackers: [
-      {id:"att9", label:"Attacker 9"},
-      {id:"att10", label:"Attacker 10"},
-      {id:"att11", label:"Attacker 11"},
-      {id:"att12", label:"Attacker 12"},
-      {id:"att6", label:"Attacker 6"}, // common with Hub 2
-      {id:"att7", label:"Attacker 7"}, // common with Hub 2
-      {id:"att8", label:"Attacker 8"}  // common with Hub 2
-    ]
-  }
-  // Add more hubs here if needed
+// --- Define hubs ---
+const hubs = [
+  { id: "hub1", x: width/2, y: height/4, icon: "🛡️", label: "Hub 1" },
+  { id: "hub2", x: width/4, y: (3*height)/4, icon: "⚡", label: "Hub 2" },
+  { id: "hub3", x: (3*width)/4, y: (3*height)/4, icon: "🔥", label: "Hub 3" }
 ];
 
-// Helper radius function
-function getRadius(d){ return d.type==="hub"?40:Math.max(20,(d.label||d.id).length*3); }
+// --- Define children ---
+const children = [
+  { id: "c1", icon: "📁", label: "C1" },
+  { id: "c2", icon: "📁", label: "C2" },
+  { id: "c3", icon: "📁", label: "C3" },
+  { id: "c4", icon: "📁", label: "C4" },
+  { id: "c5", icon: "📁", label: "C5" },
+  { id: "c6", icon: "📁", label: "C6" }
+];
 
-// ===== Build nodes and links =====
-const nodes = [];
-const links = [];
-const nodeMap = new Map();
+// --- Define links ---
+const links = [
+  { source: "hub1", target: "c1" },
+  { source: "hub1", target: "c2" },
+  { source: "hub2", target: "c2" },
+  { source: "hub2", target: "c3" },
+  { source: "hub3", target: "c3" },
+  { source: "hub3", target: "c4" },
+  { source: "hub1", target: "c5" },
+  { source: "hub3", target: "c5" },
+  { source: "hub2", target: "c6" }
+];
 
-// Place hubs horizontally
-const hubCount = hubsData.length;
-hubsData.forEach((hub, i)=>{
-  const hubNode = {
-    id: hub.id,
-    label: hub.label,
-    type: "hub",
-    x: (i+1)*width/(hubCount+1),
-    y: height/2
-  };
-  nodes.push(hubNode);
-  nodeMap.set(hub.id, hubNode);
+// --- Position children around hubs ---
+const radius = 80;
+hubs.forEach(hub => {
+  const hubChildren = links
+    .filter(l => l.source === hub.id)
+    .map(l => children.find(c => c.id === l.target));
+
+  hubChildren.forEach((child, i) => {
+    if (child.x === undefined && child.y === undefined) {
+      child.x = hub.x + radius * Math.cos((2 * Math.PI * i) / hubChildren.length);
+      child.y = hub.y + radius * Math.sin((2 * Math.PI * i) / hubChildren.length);
+    } else {
+      child.x = (child.x + hub.x) / 2;
+      child.y = (child.y + hub.y) / 2;
+    }
+  });
 });
 
-// Add attackers
-hubsData.forEach(hub=>{
-  hub.attackers.forEach(att=>{
-    let attackerNode;
-    if(nodeMap.has(att.id)){
-      attackerNode = nodeMap.get(att.id);
-      if(!attackerNode.hubs.includes(hub.id)) attackerNode.hubs.push(hub.id);
-    } else {
-      attackerNode = {id: att.id, label: att.label, type:"attacker", hubs:[hub.id]};
-      nodes.push(attackerNode);
-      nodeMap.set(att.id, attackerNode);
-    }
-    links.push({source: hub.id, target: att.id});
-  });
-});
+// --- Combine all nodes ---
+const nodes = [...hubs, ...children];
 
-// ===== Clean, organized layout =====
-function layoutNodes() {
-  // Place hubs horizontally with good spacing
-  const hubCount = hubsData.length;
-  hubsData.forEach((hub, i)=>{
-    const hubNode = nodeMap.get(hub.id);
-    hubNode.x = (i+1)*width/(hubCount+1);
-    hubNode.y = height/2;
-  });
-
-  // Place unique attackers in clean circles around their hubs
-  hubsData.forEach(hub=>{
-    const hubNode = nodeMap.get(hub.id);
-    const children = nodes.filter(n=>n.type==="attacker" && n.hubs.length===1 && n.hubs[0]===hub.id);
-    
-    if (children.length > 0) {
-      const baseRadius = hubPadding + Math.max(...children.map(c=>getRadius(c)));
-      
-      children.forEach((child, i)=>{
-        const angle = (2 * Math.PI * i) / children.length;
-        const radius = baseRadius + getRadius(child) + 20; // 20px buffer between nodes
-        
-        child.x = hubNode.x + radius * Math.cos(angle);
-        child.y = hubNode.y + radius * Math.sin(angle);
-      });
-    }
-  });
-
-  // Place common attackers strategically in the center to avoid edge crossings
-  const commonNodes = nodes.filter(n=>n.type==="attacker" && n.hubs.length>1);
-  if (commonNodes.length > 0) {
-    // Position common nodes in the center area with strategic spacing
-    const centerX = width / 2;
-    const centerY = height / 2;
-    
-    if (commonNodes.length === 1) {
-      // Single common node goes in center
-      commonNodes[0].x = centerX;
-      commonNodes[0].y = centerY;
-    } else if (commonNodes.length === 2) {
-      // Two common nodes side by side in center
-      commonNodes[0].x = centerX - 70;
-      commonNodes[0].y = centerY;
-      commonNodes[1].x = centerX + 70;
-      commonNodes[1].y = centerY;
-    } else if (commonNodes.length === 3) {
-      // Three common nodes in a triangle pattern in center
-      commonNodes[0].x = centerX;
-      commonNodes[0].y = centerY - 60;
-      commonNodes[1].x = centerX - 70;
-      commonNodes[1].y = centerY + 40;
-      commonNodes[2].x = centerX + 70;
-      commonNodes[2].y = centerY + 40;
-    } else {
-      // More than 3: use compact grid
-      const gridCols = Math.ceil(Math.sqrt(commonNodes.length));
-      const gridRows = Math.ceil(commonNodes.length / gridCols);
-      const gridSpacing = 80;
-      
-      commonNodes.forEach((node, i)=>{
-        const col = i % gridCols;
-        const row = Math.floor(i / gridCols);
-        node.x = centerX + (col - (gridCols-1)/2) * gridSpacing;
-        node.y = centerY + (row - (gridRows-1)/2) * gridSpacing;
-      });
-    }
-  }
-}
-
-layoutNodes();
-
-// Debug: log nodes and their positions
-console.log("Nodes:", nodes);
-console.log("Links:", links);
-
-// ===== Draw SVG =====
-const svg = d3.select("svg")
-  .attr("width", width)
-  .attr("height", height);
-
-// Add background
-svg.append("rect")
-  .attr("width", width)
-  .attr("height", height)
-  .attr("fill", "#f8f9fa");
-
-// Draw links
-svg.append("g").attr("stroke","#999").attr("stroke-opacity",0.6)
-  .selectAll("line").data(links).join("line")
-  .attr("x1", d=>nodeMap.get(d.source).x)
-  .attr("y1", d=>nodeMap.get(d.source).y)
-  .attr("x2", d=>nodeMap.get(d.target).x)
-  .attr("y2", d=>nodeMap.get(d.target).y)
-  .attr("stroke-width",1.5);
-
-// Draw nodes
-const nodeG = svg.append("g").selectAll("g").data(nodes).join("g")
-  .attr("transform", d => `translate(${d.x},${d.y})`);
-
-nodeG.append("circle")
-  .attr("r", d=>getRadius(d))
-  .attr("fill", d=>d.type==="hub"?"#ff7f0e":"#1f77b4")
+// --- Draw links ---
+const link = svg.selectAll("line")
+  .data(links)
+  .join("line")
   .attr("stroke", "#333")
   .attr("stroke-width", 2);
 
-nodeG.append("text")
-  .text(d=>d.label||d.id)
-  .attr("fill","white")
-  .attr("font-size","12px")
-  .attr("font-weight", "bold")
-  .attr("text-anchor","middle")
-  .attr("dominant-baseline","middle");
+// --- Draw nodes using <g> ---
+const node = svg.selectAll("g")
+  .data(nodes)
+  .join("g")
+  .attr("transform", d => `translate(${d.x},${d.y})`)
+  .call(d3.drag()
+    .on("start", dragstarted)
+    .on("drag", dragged)
+    .on("end", dragended)
+  )
+  .on("click", (event, d) => {
+    if (!hubs.includes(d)) childClicked(d);
+  });
+
+// --- Add circles ---
+node.append("circle")
+  .attr("r", d => hubs.includes(d) ? 30 : 20)
+  .attr("fill", d => hubs.includes(d) ? "#f66" : "#6cf")
+  .attr("stroke", "#000")
+  .attr("stroke-width", 1.5);
+
+// --- Add icon inside circle ---
+node.append("text")
+  .attr("text-anchor", "middle")
+  .attr("dy", "-2") // slightly above center for label space
+  .attr("font-size", d => hubs.includes(d) ? 18 : 14)
+  .text(d => d.icon);
+
+// --- Add label inside circle, below icon ---
+node.append("text")
+  .attr("text-anchor", "middle")
+  .attr("dy", "14") // below the icon
+  .attr("font-size", d => hubs.includes(d) ? 12 : 10)
+  .text(d => d.label);
+
+// --- Update positions ---
+function update() {
+  link
+    .attr("x1", d => nodes.find(n => n.id === d.source).x)
+    .attr("y1", d => nodes.find(n => n.id === d.source).y)
+    .attr("x2", d => nodes.find(n => n.id === d.target).x)
+    .attr("y2", d => nodes.find(n => n.id === d.target).y);
+
+  node.attr("transform", d => `translate(${d.x},${d.y})`);
+}
+
+// --- Drag handlers ---
+function dragstarted(event, d) { d3.select(this).raise(); }
+function dragged(event, d) { d.x = event.x; d.y = event.y; update(); }
+function dragended(event, d) {}
+
+// --- Child click handler ---
+function childClicked(child) { console.log("Child clicked:", child.id); }
+
+// --- Initial render ---
+update();
 </script>
 </body>
-</html>
