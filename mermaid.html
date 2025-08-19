@@ -94,11 +94,11 @@
 
     <div class="controls">
       <button class="btn btn-red"
-        onclick="renderMermaid({ circle: 'ingress', agentName: 'Agent 1', llmName: 'LLM3', color: '#e74c3c' })">1</button>
+        onclick="renderMermaid({ circle: 'ingress', agentName: 'Agent 1', llmName: 'Claude', color: '#e74c3c' })">1</button>
       <button class="btn btn-orange"
-        onclick="renderMermaid({ circle: 'ingress', agentName: 'Agent 3', llmName: 'LLM2', color: '#e67e22' })">2</button>
+        onclick="renderMermaid({ circle: 'ingress', agentName: 'Agent 2', llmName: 'Gemini', color: '#e67e22' })">2</button>
       <button class="btn btn-purple"
-        onclick="renderMermaid({ circle: 'egress', agentName: 'Agent 2', llmName: 'LLM1', color: '#9b59b6' })">3</button>
+        onclick="renderMermaid({ circle: 'egress', agentName: 'Agent 3', llmName: 'OpenAI', color: '#9b59b6' })">3</button>
       <button class="btn btn-reset" onclick="resetToDefault()">None</button>
     </div>
 
@@ -202,7 +202,7 @@
           nodeClasses[llmId] = "node-unmarked";
 
           edges.push([agentId, llmId]);
-          lines.push(`${agentId} --> ${llmId}((${llm.name}))`);
+          lines.push(`${agentId} --> ${llmId}((<img src="${llm.icon}" width="72" height="72" style="display: block; margin: 0 auto; object-fit: contain;"/>))`);
         });
       });
 
@@ -280,9 +280,9 @@
       attacker: "Attacker",
       vm: { name: "VM", ingress: "ingress", egress: "egress" },
       agents: [
-        { name: "Agent 1", llms: [{ name: "LLM1" }, { name: "LLM2" }, { name: "LLM3" }, { name: "LLM4" }] },
-        { name: "Agent 2", llms: [{ name: "LLM1" }] },
-        { name: "Agent 3", llms: [{ name: "LLM1" }, { name: "LLM2" }, { name: "LLM3" }] },
+        { name: "Agent 1", llms: [{ name: "Gemini", icon: "icons/gemini.png" }, { name: "Claude", icon: "icons/claude.png" }] },
+        { name: "Agent 2", llms: [{ name: "Gemini", icon: "icons/gemini.png" }] },
+        { name: "Agent 3", llms: [{ name: "Claude", icon: "icons/claude.png" }, { name: "OpenAI", icon: "icons/openai.png" }, { name: "Gemini", icon: "icons/gemini.png" }] },
       ]
     };
 
