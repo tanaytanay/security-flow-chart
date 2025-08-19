@@ -182,8 +182,8 @@
       let vmLabel = `<div style='text-align: center;'>
         <strong>${data.vm.name}</strong><br/>
         <div style='display: flex; flex-direction: column; align-items: center; gap: 10px;'>
-          <div id='ingress-circle' style='width: 60px; height: 60px; border-radius: 50%; background: transparent; border: 1px solid ${ingressBorder}; display: flex; align-items: center; justify-content: center; color: black; font-weight: bold; font-size: 12px;'>ingress</div>
-          <div id='egress-circle' style='width: 60px; height: 60px; border-radius: 50%; background: transparent; border: 1px solid ${egressBorder}; display: flex; align-items: center; justify-content: center; color: black; font-weight: bold; font-size: 12px;'>egress</div>
+          <div id='ingress-circle' style='width: 60px; height: 60px; border-radius: 50%; background: transparent; border: 1px solid ${ingressBorder}; display: flex; align-items: center; justify-content: center;'><img src='icons/aif_ingress.png' width='72' height='72' style='object-fit: contain;'/></div>
+          <div id='egress-circle' style='width: 60px; height: 60px; border-radius: 50%; background: transparent; border: 1px solid ${egressBorder}; display: flex; align-items: center; justify-content: center;'><img src='icons/aif_egress.png' width='72' height='72' style='object-fit: contain;'/></div>
         </div>
       </div>`;
 
@@ -233,7 +233,7 @@
       }
 
       // Add attacker -> vm edge with label as VM div
-      lines.push(`A((<strong>${data.attacker}</strong>)) --> B["${vmLabel}"]`);
+      lines.push(`A((<img src="icons/attackers.png" width="48" height="48" style="display: block; object-fit: contain;"/>)) --> B["${vmLabel}"]`);
       edges.push([attackerId, vmId]);
 
       // Mark edges on the highlighted path
