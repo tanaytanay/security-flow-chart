@@ -10,19 +10,19 @@ const height = +svg.attr("height");
 
 // --- Define hubs ---
 const hubs = [
-  { id: "hub1", x: width/2, y: height/4, icon: "🛡️", label: "Hub 1" },
-  { id: "hub2", x: width/4, y: (3*height)/4, icon: "⚡", label: "Hub 2" },
-  { id: "hub3", x: (3*width)/4, y: (3*height)/4, icon: "🔥", label: "Hub 3" }
+  { id: "hub1", x: width/2, y: height/4, icon: "icons/aif-logo_p.png", label: "aiF 1" },
+  { id: "hub2", x: width/4, y: (3*height)/4, icon: "icons/aif-logo_p.png", label: "aiF 2" },
+  { id: "hub3", x: (3*width)/4, y: (3*height)/4, icon: "icons/aif-logo_p.png", label: "aiF 3" }
 ];
 
 // --- Define children ---
 const children = [
-  { id: "c1", icon: "📁", label: "C1" },
-  { id: "c2", icon: "📁", label: "C2" },
-  { id: "c3", icon: "📁", label: "C3" },
-  { id: "c4", icon: "📁", label: "C4" },
-  { id: "c5", icon: "📁", label: "C5" },
-  { id: "c6", icon: "📁", label: "C6" }
+  { id: "c1", icon: "icons/attackers.png", label: "Att 1" },
+  { id: "c2", icon: "icons/attackers.png", label: "Att 2" },
+  { id: "c3", icon: "icons/attackers.png", label: "Att 3" },
+  { id: "c4", icon: "icons/attackers.png", label: "Att 4" },
+  { id: "c5", icon: "icons/attackers.png", label: "Att 5" },
+  { id: "c6", icon: "icons/attackers.png", label: "Att 6" }
 ];
 
 // --- Define links ---
@@ -59,12 +59,12 @@ hubs.forEach(hub => {
 // --- Combine all nodes ---
 const nodes = [...hubs, ...children];
 
-// --- Draw links ---
+// --- Draw links with stroke width 1 ---
 const link = svg.selectAll("line")
   .data(links)
   .join("line")
   .attr("stroke", "#333")
-  .attr("stroke-width", 2);
+  .attr("stroke-width", 1);
 
 // --- Draw nodes using <g> ---
 const node = svg.selectAll("g")
@@ -80,26 +80,65 @@ const node = svg.selectAll("g")
     if (!hubs.includes(d)) childClicked(d);
   });
 
-// --- Add circles ---
+// --- Add circles with hub/child colors and stroke width 1 ---
 node.append("circle")
-  .attr("r", d => hubs.includes(d) ? 30 : 20)
-  .attr("fill", d => hubs.includes(d) ? "#f66" : "#6cf")
+  .attr("r", d => hubs.includes(d) ? 40 : 30)
+  .attr("fill", d => hubs.includes(d) ? "#79c7b0" : "#FFA07A")
   .attr("stroke", "#000")
-  .attr("stroke-width", 1.5);
+  .attr("stroke-width", 1)
+  // --- Hub hover effect ---
+  .on("mouseover", function(event, d) {
+    if (!hubs.includes(d)) return;
 
-// --- Add icon inside circle ---
-node.append("text")
-  .attr("text-anchor", "middle")
-  .attr("dy", "-2") // slightly above center for label space
-  .attr("font-size", d => hubs.includes(d) ? 18 : 14)
-  .text(d => d.icon);
+    // find connected children
+    const connectedChildren = links
+      .filter(l => l.source === d.id)
+      .map(l => l.target);
 
-// --- Add label inside circle, below icon ---
-node.append("text")
-  .attr("text-anchor", "middle")
-  .attr("dy", "14") // below the icon
-  .attr("font-size", d => hubs.includes(d) ? 12 : 10)
-  .text(d => d.label);
+    // highlight connected links red, others gray
+    link.attr("stroke", l => l.source === d.id ? "red" : "#ccc");
+
+    // hubs: only hovered hub keeps color, others gray
+    node.select("circle").attr("fill", n => {
+      if (n === d) return "#79c7b0";
+      if (!hubs.includes(n) && connectedChildren.includes(n.id)) return n === d ? "#79c7b0" : "#db7163"; // connected children keep color
+      return "#ccc"; // other nodes gray
+    });
+
+    // dim all text for unconnected nodes
+    node.select("text").attr("fill", n => {
+      if (n === d) return "#000";
+      if (!hubs.includes(n) && connectedChildren.includes(n.id)) return "#000"; // connected children text stays
+      return "#555";
+    });
+  })
+  .on("mouseout", function(event, d) {
+    // restore original colors
+    link.attr("stroke", "#333");
+    node.select("circle").attr("fill", n => hubs.includes(n) ? "#79c7b0" : "#FFA07A");
+    node.select("text").attr("fill", "#000");
+  });
+
+// --- Add icon and label dynamically inside circle ---
+node.each(function(d) {
+  const group = d3.select(this);
+  const radius = hubs.includes(d) ? 40 : 30;
+  const iconSize = hubs.includes(d) ? 30 : 24;
+  const spacing = 4;
+
+  group.append("image")
+    .attr("href", d.icon)
+    .attr("x", -iconSize/2)
+    .attr("y", -iconSize/2 - spacing/2)
+    .attr("width", iconSize)
+    .attr("height", iconSize);
+
+  group.append("text")
+    .attr("text-anchor", "middle")
+    .attr("y", iconSize/2 + spacing)
+    .attr("font-size", hubs.includes(d) ? 12 : 10)
+    .text(d.label);
+});
 
 // --- Update positions ---
 function update() {
