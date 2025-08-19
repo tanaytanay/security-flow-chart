@@ -42,49 +42,25 @@
       margin: 20px 0;
     }
 
-    .btn {
-      color: white;
-      border: none;
+    .scenario-dropdown {
       padding: 10px 20px;
-      margin: 5px;
-      border-radius: 5px;
-      cursor: pointer;
       font-size: 14px;
-      font-weight: bold;
-      user-select: none;
-      transition: background-color 0.3s ease;
+      border: 2px solid #ddd;
+      border-radius: 5px;
+      background-color: white;
+      color: #333;
+      cursor: pointer;
+      min-width: 250px;
+      transition: border-color 0.3s ease;
     }
 
-    .btn-red {
-      background-color: #91d18a;
+    .scenario-dropdown:focus {
+      outline: none;
+      border-color: #3498db;
     }
 
-    .btn-red:hover {
-      background-color: #91d18a;
-    }
-
-    .btn-orange {
-      background-color: #8d70c4;
-    }
-
-    .btn-orange:hover {
-      background-color: #8d70c4;
-    }
-
-    .btn-purple {
-      background-color: #7fe3d2;
-    }
-
-    .btn-purple:hover {
-      background-color: #7fe3d2;
-    }
-
-    .btn-reset {
-      background-color: #3498db;
-    }
-
-    .btn-reset:hover {
-      background-color: #2980b9;
+    .scenario-dropdown:hover {
+      border-color: #bdc3c7;
     }
   </style>
 </head>
@@ -93,13 +69,13 @@
   <div class="container">
 
     <div class="controls">
-      <button class="btn btn-red"
-        onclick="renderMermaid({ circle: 'ingress', agentName: 'API', llmName: 'Claude', color: '#91d18a' })">1</button>
-      <button class="btn btn-orange"
-        onclick="renderMermaid({ circle: 'ingress', agentName: 'AI bot', llmName: 'Gemini', color: '#8d70c4' })">2</button>
-      <button class="btn btn-purple"
-        onclick="renderMermaid({ circle: 'egress', agentName: 'Chatbot', llmName: 'OpenAI', color: '#7fe3d2' })">3</button>
-      <button class="btn btn-reset" onclick="resetToDefault()">None</button>
+      <select id="scenarioSelect" class="scenario-dropdown" onchange="handleScenarioChange()">
+        <option value="">Select a scenario...</option>
+        <option value="1">1 - API + Claude (Ingress)</option>
+        <option value="2">2 - AI bot + Gemini (Ingress)</option>
+        <option value="3">3 - Chatbot + OpenAI (Egress)</option>
+        <option value="reset">None</option>
+      </select>
     </div>
 
     <div class="mermaid" id="chart"></div>
@@ -110,6 +86,20 @@
     // Reset page
     function resetToDefault() {
       location.reload();
+    }
+
+    // Handle dropdown scenario changes
+    function handleScenarioChange() {
+      const select = document.getElementById('scenarioSelect');
+      const value = select.value;
+
+      const scenario = {
+        "1": { circle: 'ingress', agentName: 'API', llmName: 'Claude', color: '#91d18a' },
+        "2": { circle: 'ingress', agentName: 'AI bot', llmName: 'Gemini', color: '#8d70c4' },
+        "3": { circle: 'egress', agentName: 'Chatbot', llmName: 'OpenAI', color: '#7fe3d2' },
+      }
+
+      renderMermaid(scenario[value]);
     }
 
     // Mermaid config
