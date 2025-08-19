@@ -56,27 +56,27 @@
     }
 
     .btn-red {
-      background-color: #e74c3c;
+      background-color: #91d18a;
     }
 
     .btn-red:hover {
-      background-color: #c0392b;
+      background-color: #91d18a;
     }
 
     .btn-orange {
-      background-color: #e67e22;
+      background-color: #8d70c4;
     }
 
     .btn-orange:hover {
-      background-color: #d35400;
+      background-color: #8d70c4;
     }
 
     .btn-purple {
-      background-color: #9b59b6;
+      background-color: #7fe3d2;
     }
 
     .btn-purple:hover {
-      background-color: #8e44ad;
+      background-color: #7fe3d2;
     }
 
     .btn-reset {
@@ -94,11 +94,11 @@
 
     <div class="controls">
       <button class="btn btn-red"
-        onclick="renderMermaid({ circle: 'ingress', agentName: 'API', llmName: 'Claude', color: '#e74c3c' })">1</button>
+        onclick="renderMermaid({ circle: 'ingress', agentName: 'API', llmName: 'Claude', color: '#91d18a' })">1</button>
       <button class="btn btn-orange"
-        onclick="renderMermaid({ circle: 'ingress', agentName: 'AI bot', llmName: 'Gemini', color: '#e67e22' })">2</button>
+        onclick="renderMermaid({ circle: 'ingress', agentName: 'AI bot', llmName: 'Gemini', color: '#8d70c4' })">2</button>
       <button class="btn btn-purple"
-        onclick="renderMermaid({ circle: 'egress', agentName: 'Chatbot', llmName: 'OpenAI', color: '#9b59b6' })">3</button>
+        onclick="renderMermaid({ circle: 'egress', agentName: 'Chatbot', llmName: 'OpenAI', color: '#7fe3d2' })">3</button>
       <button class="btn btn-reset" onclick="resetToDefault()">None</button>
     </div>
 
@@ -106,6 +106,7 @@
   </div>
 
   <script>
+    
     // Reset page
     function resetToDefault() {
       location.reload();
@@ -162,15 +163,19 @@
       // Build VM label with circles colored appropriately
       let ingressBg = ingressDefault;
       let egressBg = egressDefault;
-      let ingressBorder = '#3498db';
-      let egressBorder = '#3498db';
+      let ingressBorder = '#d1d1d1';
+      let egressBorder = '#d1d1d1';
+      let ingressBorderWidth = '1px';
+      let egressBorderWidth = '1px';
 
       if (mark && mark.circle === "ingress") {
         ingressBg = highlightColor;
         ingressBorder = highlightColor;
+        ingressBorderWidth = '3px';
       } else if (mark && mark.circle === "egress") {
         egressBg = highlightColor;
         egressBorder = highlightColor;
+        egressBorderWidth = '3px';
       }
 
       ingressBorder = hexToRgb(ingressBorder);
@@ -182,8 +187,8 @@
       let vmLabel = `<div style='text-align: center;'>
         <strong>${data.vm.name}</strong><br/>
         <div style='display: flex; flex-direction: column; align-items: center; gap: 10px;'>
-          <div id='ingress-circle' style='width: 60px; height: 60px; border-radius: 50%; background: transparent; border: 1px solid ${ingressBorder}; display: flex; align-items: center; justify-content: center;'><img src='icons/aif_ingress.png' width='72' height='72' style='object-fit: contain;'/></div>
-          <div id='egress-circle' style='width: 60px; height: 60px; border-radius: 50%; background: transparent; border: 1px solid ${egressBorder}; display: flex; align-items: center; justify-content: center;'><img src='icons/aif_egress.png' width='72' height='72' style='object-fit: contain;'/></div>
+          <div id='ingress-circle' style='width: 60px; height: 60px; border-radius: 50%; background: transparent; border: ${ingressBorderWidth} solid ${ingressBorder}; display: flex; align-items: center; justify-content: center;'><img src='icons/aif_ingress.png' width='72' height='72' style='object-fit: contain;'/></div>
+          <div id='egress-circle' style='width: 60px; height: 60px; border-radius: 50%; background: transparent; border: ${egressBorderWidth} solid ${egressBorder}; display: flex; align-items: center; justify-content: center;'><img src='icons/aif_egress.png' width='72' height='72' style='object-fit: contain;'/></div>
         </div>
       </div>`;
 
@@ -195,7 +200,7 @@
         nodeClasses[agentId] = "node-unmarked";
 
         edges.push([vmId, agentId]);
-        lines.push(`B --> ${agentId}((<img src="${agent.icon}" width="72" height="72" style="vertical-align: middle; margin-right: 3px; object-fit: contain;"/>${agent.name}))`);
+        lines.push(`B --> ${agentId}((<img src="${agent.icon}" width="48" height="48" style="vertical-align: middle; margin-right: 3px; object-fit: contain;"/>${agent.name}))`);
 
         agent.llms.forEach((llm, li) => {
           const llmId = `D${ai + 1}_${li + 1}`;
@@ -249,11 +254,10 @@
       });
 
       lines.push("");
-      lines.push(`classDef node-marked fill:transparent,color:#000,stroke:${highlightColor};`);
-      lines.push("classDef node-unmarked fill:transparent,color:#000,stroke:#3498db;");
+      lines.push(`classDef node-marked fill:transparent,color:#000,stroke:${highlightColor},stroke-width:3px;`);
+      lines.push("classDef node-unmarked fill:transparent,color:#000,stroke:#d1d1d1;");
       lines.push("classDef vm-node fill:transparent,color:#000,stroke:#a8a8a8;");
       lines.push(`classDef edge-marked stroke:${highlightColor},stroke-width:3px;`);
-      lines.push("classDef edge-unmarked stroke:#000,stroke-width:1px;");
 
       // Always gray VM node
       lines.push(`class B vm-node;`);
@@ -268,7 +272,7 @@
         if (markedEdgesIndexes.includes(i)) {
           lines.push(`linkStyle ${i} stroke:${highlightColor},stroke-width:3px;`);
         } else {
-          lines.push(`linkStyle ${i} stroke:#000,stroke-width:1px;`);
+          lines.push(`linkStyle ${i} stroke:#d1d1d1,stroke-width:1px;`);
         }
       });
 
