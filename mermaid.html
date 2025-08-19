@@ -23,11 +23,7 @@
       box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
     }
 
-    h1 {
-      color: #2c3e50;
-      text-align: center;
-      margin-bottom: 30px;
-    }
+
 
     .mermaid {
       text-align: center;
@@ -70,7 +66,7 @@
 
     <div class="controls">
       <select id="scenarioSelect" class="scenario-dropdown" onchange="handleScenarioChange()">
-        <option value="">Select a scenario...</option>
+        <option value="">Selet attack path...</option>
         <option value="1">1 - API + Claude (Ingress)</option>
         <option value="2">2 - AI bot + Gemini (Ingress)</option>
         <option value="3">3 - Chatbot + OpenAI (Egress)</option>
@@ -83,6 +79,12 @@
 
   <script>
     
+    // Constants
+    const DEFAULT_BORDER_COLOR = '#d1d1d1';
+    const DEFAULT_BORDER_WIDTH = '1px';
+    const HIGHLIGHTED_BORDER_WIDTH = '3px';
+    const VM_NODE_COLOR = '#a8a8a8';
+    
     // Reset page
     function resetToDefault() {
       location.reload();
@@ -93,13 +95,13 @@
       const select = document.getElementById('scenarioSelect');
       const value = select.value;
 
-      const scenario = {
+      const attackPath = {
         "1": { circle: 'ingress', agentName: 'API', llmName: 'Claude', color: '#91d18a' },
         "2": { circle: 'ingress', agentName: 'AI bot', llmName: 'Gemini', color: '#8d70c4' },
         "3": { circle: 'egress', agentName: 'Chatbot', llmName: 'OpenAI', color: '#7fe3d2' },
       }
 
-      renderMermaid(scenario[value]);
+      renderMermaid(attackPath[value]);
     }
 
     // Mermaid config
@@ -151,28 +153,22 @@
       const highlightColor = mark && mark.color ? mark.color : ingressDefault;
 
       // Build VM label with circles colored appropriately
-      let ingressBg = ingressDefault;
-      let egressBg = egressDefault;
-      let ingressBorder = '#d1d1d1';
-      let egressBorder = '#d1d1d1';
-      let ingressBorderWidth = '1px';
-      let egressBorderWidth = '1px';
+      let ingressBorder = DEFAULT_BORDER_COLOR;
+      let egressBorder = DEFAULT_BORDER_COLOR;
+      let ingressBorderWidth = DEFAULT_BORDER_WIDTH;
+      let egressBorderWidth = DEFAULT_BORDER_WIDTH;
 
       if (mark && mark.circle === "ingress") {
         ingressBg = highlightColor;
         ingressBorder = highlightColor;
-        ingressBorderWidth = '3px';
+        ingressBorderWidth = HIGHLIGHTED_BORDER_WIDTH;
       } else if (mark && mark.circle === "egress") {
-        egressBg = highlightColor;
         egressBorder = highlightColor;
-        egressBorderWidth = '3px';
+        egressBorderWidth = HIGHLIGHTED_BORDER_WIDTH;
       }
 
       ingressBorder = hexToRgb(ingressBorder);
       egressBorder = hexToRgb(egressBorder);
-
-      console.log("ingressBorder:", ingressBorder, typeof ingressBorder);
-      console.log("egressBorder:", egressBorder, typeof egressBorder);
 
       let vmLabel = `<div style='text-align: center;'>
         <strong>${data.vm.name}</strong><br/>
@@ -244,10 +240,10 @@
       });
 
       lines.push("");
-      lines.push(`classDef node-marked fill:transparent,color:#000,stroke:${highlightColor},stroke-width:3px;`);
-      lines.push("classDef node-unmarked fill:transparent,color:#000,stroke:#d1d1d1;");
-      lines.push("classDef vm-node fill:transparent,color:#000,stroke:#a8a8a8;");
-      lines.push(`classDef edge-marked stroke:${highlightColor},stroke-width:3px;`);
+      lines.push(`classDef node-marked fill:transparent,color:#000,stroke:${highlightColor},stroke-width:${HIGHLIGHTED_BORDER_WIDTH};`);
+      lines.push(`classDef node-unmarked fill:transparent,color:#000,stroke:${DEFAULT_BORDER_COLOR};`);
+      lines.push(`classDef vm-node fill:transparent,color:#000,stroke:${VM_NODE_COLOR};`);
+      lines.push(`classDef edge-marked stroke:${highlightColor},stroke-width:${HIGHLIGHTED_BORDER_WIDTH};`);
 
       // Always gray VM node
       lines.push(`class B vm-node;`);
@@ -260,16 +256,16 @@
 
       edges.forEach(([src, dst], i) => {
         if (markedEdgesIndexes.includes(i)) {
-          lines.push(`linkStyle ${i} stroke:${highlightColor},stroke-width:3px;`);
+          lines.push(`linkStyle ${i} stroke:${highlightColor},stroke-width:${HIGHLIGHTED_BORDER_WIDTH};`);
         } else {
-          lines.push(`linkStyle ${i} stroke:#d1d1d1,stroke-width:1px;`);
+          lines.push(`linkStyle ${i} stroke:${DEFAULT_BORDER_COLOR},stroke-width:${DEFAULT_BORDER_WIDTH};`);
         }
       });
 
       return lines.join("\n");
     }
 
-    // Your data
+    // Security flow data configuration
     const securityFlowData = {
       attacker: "Attacker",
       vm: { name: "VM", ingress: "ingress", egress: "egress" },
