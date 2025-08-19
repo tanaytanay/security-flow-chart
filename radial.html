@@ -10,10 +10,32 @@ const height = +svg.attr("height");
 
 // --- Define hubs ---
 const hubs = [
-  { id: "hub1", x: width/2, y: height/4, icon: "icons/aif-logo_p.png", label: "aiF 1" },
-  { id: "hub2", x: width/4, y: (3*height)/4, icon: "icons/aif-logo_p.png", label: "aiF 2" },
-  { id: "hub3", x: (3*width)/4, y: (3*height)/4, icon: "icons/aif-logo_p.png", label: "aiF 3" }
+  { id: "hub1", icon: "icons/aif-logo_p.png", label: "aiF 1" },
+  { id: "hub2", icon: "icons/aif-logo_p.png", label: "aiF 2" },
+  { id: "hub3", icon: "icons/aif-logo_p.png", label: "aiF 3" },
+  { id: "hub4", icon: "icons/aif-logo_p.png", label: "aiF 4" }
 ];
+
+// --- Dynamic hub positions ---
+const centerX = width / 2;
+const centerY = height / 2;
+let hubRadius = 200; // distance from center
+
+if (hubs.length === 2) {
+  // position horizontally
+  hubs[0].x = centerX - hubRadius / 2;
+  hubs[0].y = centerY;
+  hubs[1].x = centerX + hubRadius / 2;
+  hubs[1].y = centerY;
+} else {
+  // regular polygon for 3 or more hubs
+  hubs.forEach((hub, i) => {
+    const n = hubs.length;
+    const angle = (2 * Math.PI * i) / n - Math.PI/2; // start from top
+    hub.x = centerX + hubRadius * Math.cos(angle);
+    hub.y = centerY + hubRadius * Math.sin(angle);
+  });
+}
 
 // --- Define children ---
 const children = [
@@ -22,7 +44,8 @@ const children = [
   { id: "c3", icon: "icons/attackers.png", label: "Att 3" },
   { id: "c4", icon: "icons/attackers.png", label: "Att 4" },
   { id: "c5", icon: "icons/attackers.png", label: "Att 5" },
-  { id: "c6", icon: "icons/attackers.png", label: "Att 6" }
+  { id: "c6", icon: "icons/attackers.png", label: "Att 6" },
+  { id: "c7", icon: "icons/attackers.png", label: "Att 7" }
 ];
 
 // --- Define links ---
@@ -35,11 +58,12 @@ const links = [
   { source: "hub3", target: "c4" },
   { source: "hub1", target: "c5" },
   { source: "hub3", target: "c5" },
-  { source: "hub2", target: "c6" }
+  { source: "hub2", target: "c6" },
+  { source: "hub4", target: "c7" }
 ];
 
 // --- Position children around hubs ---
-const radius = 80;
+const childRadius = 80;
 hubs.forEach(hub => {
   const hubChildren = links
     .filter(l => l.source === hub.id)
@@ -47,8 +71,8 @@ hubs.forEach(hub => {
 
   hubChildren.forEach((child, i) => {
     if (child.x === undefined && child.y === undefined) {
-      child.x = hub.x + radius * Math.cos((2 * Math.PI * i) / hubChildren.length);
-      child.y = hub.y + radius * Math.sin((2 * Math.PI * i) / hubChildren.length);
+      child.x = hub.x + childRadius * Math.cos((2 * Math.PI * i) / hubChildren.length);
+      child.y = hub.y + childRadius * Math.sin((2 * Math.PI * i) / hubChildren.length);
     } else {
       child.x = (child.x + hub.x) / 2;
       child.y = (child.y + hub.y) / 2;
@@ -59,14 +83,14 @@ hubs.forEach(hub => {
 // --- Combine all nodes ---
 const nodes = [...hubs, ...children];
 
-// --- Draw links with stroke width 1 ---
+// --- Draw links ---
 const link = svg.selectAll("line")
   .data(links)
   .join("line")
   .attr("stroke", "#333")
   .attr("stroke-width", 1);
 
-// --- Draw nodes using <g> ---
+// --- Draw nodes ---
 const node = svg.selectAll("g")
   .data(nodes)
   .join("g")
@@ -76,28 +100,19 @@ const node = svg.selectAll("g")
     .on("drag", dragged)
     .on("end", dragended)
   )
-  .on("click", (event, d) => {
-    if (!hubs.includes(d)) childClicked(d);
-  })
-  // --- Hover handler moved to <g> ---
+  .on("click", (event, d) => { if (!hubs.includes(d)) childClicked(d); })
   .on("mouseover", function(event, d) {
     if (!hubs.includes(d)) return;
-
-    const connectedChildren = links
-      .filter(l => l.source === d.id)
-      .map(l => l.target);
-
+    const connectedChildren = links.filter(l => l.source === d.id).map(l => l.target);
     link.attr("stroke", l => l.source === d.id ? "red" : "#ccc");
-
     node.select("circle").attr("fill", n => {
       if (n === d) return "#79c7b0";
-      if (!hubs.includes(n) && connectedChildren.includes(n.id)) return "#FFA07A"; // connected children keep color
+      if (!hubs.includes(n) && connectedChildren.includes(n.id)) return "#FFA07A";
       return "#ccc";
     });
-
     node.select("text").attr("fill", n => {
       if (n === d) return "#000";
-      if (!hubs.includes(n) && connectedChildren.includes(n.id)) return "#000"; // connected children text stays
+      if (!hubs.includes(n) && connectedChildren.includes(n.id)) return "#000";
       return "#555";
     });
   })
@@ -107,14 +122,14 @@ const node = svg.selectAll("g")
     node.select("text").attr("fill", "#000");
   });
 
-// --- Add circles with hub/child colors and stroke width 1 ---
+// --- Add circles ---
 node.append("circle")
   .attr("r", d => hubs.includes(d) ? 40 : 30)
   .attr("fill", d => hubs.includes(d) ? "#79c7b0" : "#FFA07A")
   .attr("stroke", "#000")
   .attr("stroke-width", 1);
 
-// --- Add icon and label dynamically inside circle ---
+// --- Add icons and labels ---
 node.each(function(d) {
   const group = d3.select(this);
   const radius = hubs.includes(d) ? 40 : 30;
@@ -142,7 +157,6 @@ function update() {
     .attr("y1", d => nodes.find(n => n.id === d.source).y)
     .attr("x2", d => nodes.find(n => n.id === d.target).x)
     .attr("y2", d => nodes.find(n => n.id === d.target).y);
-
   node.attr("transform", d => `translate(${d.x},${d.y})`);
 }
 
